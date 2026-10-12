@@ -105,8 +105,8 @@ const lanes=[0,1,2,3].map(pi=>{const grp=new THREE.Group();scene.add(grp);
  const roof=mk(new THREE.ConeGeometry(1.3,.7,4),M(0x7a3ab0),1.85,shr);roof.rotation.y=Math.PI/4;
  const orb=new THREE.Mesh(new THREE.IcosahedronGeometry(.26,0),new THREE.MeshBasicMaterial({color:0x7ff7ff}));orb.position.y=.85;shr.add(orb);const ol=new THREE.PointLight(0x7ff7ff,2,4);ol.position.y=.9;shr.add(ol);
  const slab=label('Schrein',2);slab.position.y=2.7;shr.add(slab);
- const shit=new THREE.Mesh(new THREE.BoxGeometry(2.2,3,2.2),new THREE.MeshBasicMaterial({visible:false}));shit.position.y=1.2;shit.userData={pi,schrein:1};shr.add(shit);grp.add(shr);
- return{pi,grp,tiles,hitPlane,portal,mine,depot,nug,mlab,shr,orb,ol,slab,mhit,shit,stream,workers:[],towers:new Map(),creeps:new Map(),proj:[],pathKey:'',mk:'',sk:''};});
+ const shrHit=new THREE.Mesh(new THREE.BoxGeometry(2.2,3,2.2),new THREE.MeshBasicMaterial({visible:false}));shrHit.position.y=1.2;shrHit.userData={pi,schrein:1};shr.add(shrHit);grp.add(shr);
+ return{pi,grp,tiles,hitPlane,portal,mine,depot,nug,mlab,shr,orb,ol,slab,mhit,shrHit,stream,workers:[],towers:new Map(),creeps:new Map(),proj:[],pathKey:'',mk:'',sk:''};});
 const JIT=Array.from({length:COLS*ROWS},()=>Math.random()-.5);
 function paintTiles(L,path,grid=L.gridOn){const on=path?(L.onSet=new Set(path.map(p=>p[0]+','+p[1]))):L.onSet||new Set();L.gridOn=grid;
  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){const i=y*COLS+x,pth=on.has(x+','+y),j=JIT[i];
@@ -372,11 +372,11 @@ const DZ=(()=>{const c=document.createElement('canvas');c.width=c.height=64;cons
  const ao=(o,s)=>{if(!QC.detail||o.userData.ao)return;const m=new THREE.Mesh(aoG,aoM);m.scale.set(s,1,s);m.position.y=.03;m.renderOrder=-1;o.add(m);o.userData.ao=m;};
  let shk=0;return{RT,spirit,tick,ao,shake(a){if(QC.detail||a>.2)shk=Math.max(shk,a);},cam(dt,on){if(shk<=0)return null;shk=Math.max(0,shk-dt*1.8);if(!on)return null;const a=shk*shk*.25;return[(Math.random()-.5)*a,(Math.random()-.5)*a];}};})();
 const R3D={intro:null,startIntro(ms=6500){this.intro={t0:performance.now(),dur:ms};},onLane:null,lockPan:false,goLane(i){ZM=1;ZO.x=ZO.z=0;camTX=laneCX(i);if(i!==camLane){camLane=i;R3D.onLane&&R3D.onLane(i);}},
- dbg(cx,cy){const r=cv.getBoundingClientRect();ndc.set((cx-r.left)/r.width*2-1,-((cy-r.top)/r.height)*2+1);ray.setFromCamera(ndc,cam);const h=ray.intersectObjects(lanes.flatMap(L=>[L.mhit,L.shit,L.hitPlane]),false);return h.map(x=>[x.object.userData,x.point.x.toFixed(2),x.point.z.toFixed(2)]);},
+ dbg(cx,cy){const r=cv.getBoundingClientRect();ndc.set((cx-r.left)/r.width*2-1,-((cy-r.top)/r.height)*2+1);ray.setFromCamera(ndc,cam);const h=ray.intersectObjects(lanes.flatMap(L=>[L.mhit,L.shrHit,L.hitPlane]),false);return h.map(x=>[x.object.userData,x.point.x.toFixed(2),x.point.z.toFixed(2)]);},
  zoom(cx,cy,f){zoomAt(cx,cy,f);},consumeDrag(){const d=dragged;dragged=false;return d;},
  resize(w,h){if(!w||!h)return;VH=h;renderer.setSize(w,h,true);composer.setSize(w,h);tilt.uniforms.px.value.set(1/w,1/h);aspect=w/h;cam.aspect=aspect;cam.fov=aspect<.8?46:38;cam.updateProjectionMatrix();if(R3D._wh!==w+'x'+h){R3D._wh=w+'x'+h;fitDist();}placeCam(camX);},
  pick(cx,cy){const r=cv.getBoundingClientRect();ndc.set((cx-r.left)/r.width*2-1,-((cy-r.top)/r.height)*2+1);ray.setFromCamera(ndc,cam);
-  const hits=ray.intersectObjects(lanes.flatMap(L=>[L.mhit,L.shit,L.hitPlane]),false);if(!hits.length)return null;const h=hits[0],u=h.object.userData;
+  const hits=ray.intersectObjects(lanes.flatMap(L=>[L.mhit,L.shrHit,L.hitPlane]),false);if(!hits.length)return null;const h=hits[0],u=h.object.userData;
   if(u.mine)return{mine:u.pi};if(u.schrein)return{schrein:u.pi};const fx=h.point.x-u.pi*LGAP,fy=h.point.z,x=Math.floor(fx),y=Math.floor(fy);if(x<0||y<0||x>=COLS||y>=ROWS)return null;return{pi:u.pi,x,y,fx,fy};},
  cellScreen(x,y){return toScreen(W(camLane,x+.5,y+.5,.06));},
  depot(){return toScreen(lanes[0].depot.getWorldPosition(new THREE.Vector3()));},
@@ -463,8 +463,8 @@ const SPECIAL={land_a:deco,land_b:deco,land_c:deco,
  monument(o,e){if(!QC.detail)return;for(const I of ISLG){if(!I.side)continue;const w=new THREE.Group();w.add(o.clone());w.scale.setScalar(e.scale||4);w.position.set(0,-.21,-1);w.rotation.y=I.G.position.x<0?Math.PI/2:-Math.PI/2;I.G.add(w);}}};R3D.meshy=MESHY;
 fetch('assets/meshy/manifest.json').then(r=>r.ok?r.json():null).then(mf=>{if(!mf)return;const ld=new GLTFLoader();ld.setMeshoptDecoder(MeshoptDecoder);{const k2=new KTX2Loader().setTranscoderPath('https://unpkg.com/three@0.160.0/examples/jsm/libs/basis/').detectSupport(renderer);ld.setKTX2Loader(k2);}let _env=null;const ENVT=()=>_env||(_env=new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(),.04).texture);const RACEK=k=>/^o_|hero_torvan|unit_berserker/.test(k)?'orks':/^m_|hero_ilka/.test(k)?'menschen':null,PEND=[];const LOADK=(k,e)=>{
  ld.load('assets/meshy/'+e.file,gl=>{const o=gl.scene;o.traverse(m=>{if(m.isMesh){m.geometry.userData.keep=1;m.castShadow=m.receiveShadow=true;{const mm=m.material;if(mm&&mm.isMeshStandardMaterial){if(mm.map){mm.map.colorSpace=THREE.SRGBColorSpace;mm.emissiveMap=mm.map;mm.emissive=new THREE.Color(0xffffff);mm.emissiveIntensity=.15;}mm.envMap=ENVT();mm.envMapIntensity=.9;mm.needsUpdate=true;}}if(e.color)m.material=new THREE.MeshStandardMaterial({color:e.color,roughness:.75,metalness:.15});}});const b=new THREE.Box3().setFromObject(o),sz=b.getSize(new THREE.Vector3());const sc=(e.height||1.6)/Math.max(.001,sz.y);o.scale.setScalar(sc);o.position.y=-b.min.y*sc;{const c=b.getCenter(new THREE.Vector3());o.position.x=-c.x*sc;o.position.z=-c.z*sc;}if(e.rotY)o.rotation.y=e.rotY;MESHY[k]=o;SPECIAL[k]&&SPECIAL[k](o,e);
-  for(const L of lanes)for(const t of L.towers.values())t.userData.key='';if(k==='schrein'||k==='goldmine')for(const L of lanes){const G=k==='schrein'?L.shr:L.mine;if(G.userData.meshy)continue;G.userData.meshy=1;for(const c of G.children)if(c.isMesh&&c!==L.shit&&c!==L.mhit)c.visible=false;const m=o.clone();if(e.pos)m.position.add(new THREE.Vector3(...e.pos));G.add(m);}},undefined,err=>console.warn('Meshy-Modell fehlt',e.file,err));};
+  for(const L of lanes)for(const t of L.towers.values())t.userData.key='';if(k==='schrein'||k==='goldmine')for(const L of lanes){const G=k==='schrein'?L.shr:L.mine;if(G.userData.meshy)continue;G.userData.meshy=1;for(const c of G.children)if(c.isMesh&&c!==L.shrHit&&c!==L.mhit)c.visible=false;const m=o.clone();if(e.pos)m.position.add(new THREE.Vector3(...e.pos));G.add(m);}},undefined,err=>console.warn('Meshy-Modell fehlt',e.file,err));};
  for(const[k,f]of Object.entries(mf)){if(k.startsWith('_'))continue;const e=typeof f==='string'?{file:f}:f;const rk=RACEK(k);if(rk)PEND.push([k,e,rk]);else LOADK(k,e);}
  R3D._lazy=races=>{for(let i=PEND.length-1;i>=0;i--)if(races.has(PEND[i][2])){LOADK(PEND[i][0],PEND[i][1]);PEND.splice(i,1);}};}).catch(()=>{});
 window.R3D=R3D;
-const s=document.createElement('script');s.src='ui.js?v=25';document.body.appendChild(s);
+const s=document.createElement('script');s.src='ui.js?v=26';document.body.appendChild(s);
