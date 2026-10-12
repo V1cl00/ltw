@@ -224,7 +224,8 @@ function buildHero0(H){const g=new THREE.Group(),col=hx(H.c);g.userData.c=H.c;
  const tag=label('★1',1);tag.position.y=1.45;g.add(tag);g.userData.tag=tag;return g;}
 // ---------- Kreaturen ----------
 const eyeGeo=new THREE.SphereGeometry(.06,5,4),eyeMat=M(0x111111);const hbGeo=new THREE.PlaneGeometry(.6,.08),hbBg=new THREE.MeshBasicMaterial({color:0x222222,depthTest:false});
-function buildCreep(c){const g=new THREE.Group();const col=hx(c.color);let body;
+function buildCreep(c){const g=buildCreep0(c),U=MESHY['unit_'+c.type];if(U&&(c.type==='laeufer'||c.type==='flitzer')){const ud=g.userData;g.children.forEach(ch=>{if(ch!==ud.hb)ch.visible=false;});ud.body.visible=false;if(!U.userData.fitS){const b=new THREE.Box3().setFromObject(U),s=b.getSize(new THREE.Vector3());U.userData.fitS=Math.min(1,.85/Math.max(s.x,s.z,.01));}const m=new THREE.Group();m.add(U.clone());m.scale.setScalar(U.userData.fitS);m.userData.s0=U.userData.fitS;ud.mdl=m;g.add(m);}return g;}
+function buildCreep0(c){const g=new THREE.Group();const col=hx(c.color);let body;
  if(c.fly){body=mk(new THREE.ConeGeometry(.22,.55,4),M(col),0,g);body.rotation.x=Math.PI/2;const w=mk(new THREE.BoxGeometry(.95,.05,.28),M(col),0,g);g.userData.wing=w;}
  else if(c.armor)body=mk(new THREE.DodecahedronGeometry(c.boss?.5:.32,0),M(col),c.boss?.5:.32,g);
  else body=mk(new THREE.IcosahedronGeometry(c.type==='flitzer'?.22:.28,0),M(col),.32,g);
@@ -384,6 +385,7 @@ const R3D={onLane:null,lockPan:false,goLane(i){ZM=1;ZO.x=ZO.z=0;camTX=laneCX(i);
    const cs=new Set();for(const c of ln.creeps){cs.add(c.id);let o=L.creeps.get(c.id);if(!o){o=buildCreep(c);L.grp.add(o);L.creeps.set(c.id,o);}
     const p=W(pi,c.x,c.y,c.fly?1.2+Math.sin(now*4+c.id)*.08:0),prev=o.position.clone();o.position.copy(p);const dx=p.x-prev.x,dz=p.z-prev.z;if(Math.abs(dx)+Math.abs(dz)>1e-4)o.rotation.y=Math.atan2(dx,dz);
     const b=o.userData.body,hit=now-c.hitT<.07;b.material=hit?M(0xffffff):c.slow?ME(o.userData.col,0x1a4a6a):c.dot?ME(o.userData.col,0x2a5a00):M(o.userData.col);
+    if(o.userData.mdl){const md=o.userData.mdl,sp=c.type==='flitzer'?13:9;md.position.y=Math.abs(Math.sin(now*sp+c.id))*.05;md.rotation.z=Math.sin(now*sp+c.id)*.06;md.scale.setScalar(md.userData.s0*(hit?1.12:1));}
     if(o.userData.wing)o.userData.wing.rotation.z=Math.sin(now*14)*.35;b.scale.y=now-c.hitT<.12?.8:1;
     const hb=o.userData.hb;hb.visible=c.hp<c.max;if(hb.visible){hb.quaternion.copy(o.quaternion).invert().multiply(cam.quaternion);const f=Math.max(0,c.hp/c.max);o.userData.fg.scale.x=f;o.userData.fg.position.x=-(1-f)*.3;o.userData.fg.material.color.setHSL(f*.33,1,.5);}}
    for(const[id,o]of L.creeps)if(!cs.has(id)){burst(o.position.clone().setY(.4),o.userData.col,10);L.grp.remove(o);L.creeps.delete(id);}
@@ -425,7 +427,8 @@ const R3D={onLane:null,lockPan:false,goLane(i){ZM=1;ZO.x=ZO.z=0;camTX=laneCX(i);
 // ---------- Meshy-GLB-Hook: assets/meshy/manifest.json {"m_bogen":"turm_laterne.glb", ...}; geladene Modelle ersetzen Platzhalter ----------
 const MESHY={};
 const fitBox=(o,sx,sy,sz)=>{const b=new THREE.Box3().setFromObject(o),s=b.getSize(new THREE.Vector3()),c=b.getCenter(new THREE.Vector3());const w=new THREE.Group();o.position.sub(c);w.add(o);w.scale.set(sx/s.x,sy/s.y,sz/s.z);return w;};
-const SPECIAL={
+const deco=(o,e)=>{if(!QC.detail)return;for(const I of ISLG){if(!I.side)continue;const w=new THREE.Group();w.add(o.clone());w.scale.setScalar(e.scale||2);w.position.set(0,-.21,Math.max(-I.d/2+1.5,Math.min(I.d/2-1.5,e.z||0)));w.rotation.y=(I.G.position.x<0?1:-1)*(Math.PI/2+(e.z>0?.5:-.4));I.G.add(w);}};
+const SPECIAL={land_a:deco,land_b:deco,
  tor(o,e){const s=new THREE.Box3().setFromObject(o).getSize(new THREE.Vector3()),f=(e.width||8)/s.x;for(const g of GATES){for(const c of g.children)if(c.isMesh)c.visible=false;const w=new THREE.Group();w.add(o.clone());w.scale.setScalar(f);g.add(w);}},
  klippe(o,e){if(!QC.detail)return;for(const I of ISLG){if(I.side)continue;const m=fitBox(o.clone(),I.w*1.02,e.depth||9,I.d*1.02);m.position.y=-.72-(e.depth||9)/2+.3;I.G.add(m);}},
  monument(o,e){if(!QC.detail)return;for(const I of ISLG){if(!I.side)continue;const w=new THREE.Group();w.add(o.clone());w.scale.setScalar(e.scale||4);w.position.set(0,-.21,-1);w.rotation.y=I.G.position.x<0?Math.PI/2:-Math.PI/2;I.G.add(w);}}};R3D.meshy=MESHY;
@@ -433,4 +436,4 @@ fetch('assets/meshy/manifest.json').then(r=>r.ok?r.json():null).then(mf=>{if(!mf
  ld.load('assets/meshy/'+e.file,gl=>{const o=gl.scene;o.traverse(m=>{if(m.isMesh){m.castShadow=m.receiveShadow=true;{const mm=m.material;if(mm&&mm.isMeshStandardMaterial){if(mm.map){mm.map.colorSpace=THREE.SRGBColorSpace;mm.emissiveMap=mm.map;mm.emissive=new THREE.Color(0xffffff);mm.emissiveIntensity=.15;}mm.envMap=ENVT();mm.envMapIntensity=.9;mm.needsUpdate=true;}}if(e.color)m.material=new THREE.MeshStandardMaterial({color:e.color,roughness:.75,metalness:.15});}});const b=new THREE.Box3().setFromObject(o),sz=b.getSize(new THREE.Vector3());const sc=(e.height||1.6)/Math.max(.001,sz.y);o.scale.setScalar(sc);o.position.y=-b.min.y*sc;{const c=b.getCenter(new THREE.Vector3());o.position.x=-c.x*sc;o.position.z=-c.z*sc;}if(e.rotY)o.rotation.y=e.rotY;MESHY[k]=o;SPECIAL[k]&&SPECIAL[k](o,e);
   for(const L of lanes)for(const t of L.towers.values())t.userData.key='';if(k==='schrein'||k==='goldmine')for(const L of lanes){const G=k==='schrein'?L.shr:L.mine;if(G.userData.meshy)continue;G.userData.meshy=1;for(const c of G.children)if(c.isMesh&&c!==L.shit&&c!==L.mhit)c.visible=false;const m=o.clone();if(e.pos)m.position.add(new THREE.Vector3(...e.pos));G.add(m);}},undefined,err=>console.warn('Meshy-Modell fehlt',e.file,err));}}).catch(()=>{});
 window.R3D=R3D;
-const s=document.createElement('script');s.src='ui.js?v=13';document.body.appendChild(s);
+const s=document.createElement('script');s.src='ui.js?v=14';document.body.appendChild(s);
