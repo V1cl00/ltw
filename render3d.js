@@ -468,10 +468,10 @@ const deco=(o,e,k)=>{if(o.userData.deco)return;o.userData.deco=1;perim(o,Object.
 const tintTG=(o,k)=>{const T=k==='schrein'?{c:0xbfd1a8,e:0x3a2a08,j:0x3fae84}:{c:0xd6c8a2,e:0x4a3208,j:0x3fae84};o.traverse(m=>{if(!m.isMesh||!m.material)return;const mm=m.material=m.material.clone();if(mm.color)mm.color.multiply(new THREE.Color(T.c));if(mm.emissive){mm.emissive=new THREE.Color(T.e);mm.emissiveIntensity=.35;}});
  const j=new THREE.Mesh(new THREE.TorusGeometry(.62,.035,4,24),new THREE.MeshStandardMaterial({color:T.j,emissive:T.j,emissiveIntensity:.6,roughness:.4}));j.geometry.userData.keep=1;j.rotation.x=Math.PI/2;j.position.y=.04;o.add(j);};
 // v27: Rand-Stücke (edge_cliff/edge_terrace/edge_stairs) um Bahn-Inseln, island_under (Fels+Wasserfälle) unter jede Insel – nur wenn Datei vorhanden
-const EDGE={};const edgeBuild=()=>{const ks=['edge_cliff','edge_terrace'].filter(k=>EDGE[k]);if(!ks.length)return;for(const I of ISLG){if(I.side||I.edged)continue;I.edged=1;const st=QC.detail?2.2:3.3;let n=0;
- const put=(x,z,ry)=>{const k=(EDGE.edge_stairs&&Math.abs(x)<.6&&Math.abs(z)>I.d/2-1)?'edge_stairs':ks[n++%ks.length];const o=EDGE[k];const w=new THREE.Group();w.add(o.clone());const b=new THREE.Box3().setFromObject(o).getSize(new THREE.Vector3());w.scale.setScalar(st/Math.max(b.x,.01));w.position.set(x,-.22,z);w.rotation.y=ry;I.G.add(w);};
+const EDGE={};const edgeBuild=()=>{const ks=['edge_cliff','edge_terrace'].filter(k=>EDGE[k]);if(!ks.length)return;let ii=-1;for(const I of ISLG){if(I.side)continue;ii++;if(I.edged||(EDGE.test&&ii>0))continue;I.edged=1;const st=QC.detail?2.2:3.3;let n=0;
+ const put=(x,z,ry)=>{const k=(EDGE.edge_stairs&&Math.abs(x)<.6&&Math.abs(z)>I.d/2-1)?'edge_stairs':ks[n++%ks.length];const o=EDGE[k];const w=new THREE.Group();w.add(o.clone());const b=new THREE.Box3().setFromObject(o).getSize(new THREE.Vector3());const sc=st/Math.max(b.x,.01);w.scale.setScalar(sc);w.position.set(x,-.15-b.y*sc,z);w.rotation.y=ry;I.G.add(w);};
  for(let x=-I.w/2+st/2;x<I.w/2;x+=st){put(x,-I.d/2,Math.PI);put(x,I.d/2,0);}for(let z=-I.d/2+st/2;z<I.d/2;z+=st){put(-I.w/2,z,-Math.PI/2);put(I.w/2,z,Math.PI/2);}}};
-const edgeK=(o,e,k)=>{EDGE[k]=o;for(const I of ISLG)I.edged=0;edgeBuild();};
+const edgeK=(o,e,k)=>{EDGE[k]=o;if(e.test)EDGE.test=1;for(const I of ISLG)I.edged=0;edgeBuild();};
 // v27: Boden-PBR (CC0, /assets/textures, siehe LICENSES.txt): Spielfeld = mossy_cobblestone, Inselrand = forrest_ground_01, Klippen = rock_face. KTX2, WebP-Fallback; Leicht-Qualität nur Farbe+Normal.
 const GROUND={tex(n,srgb,rep){return new Promise(res=>{const set=t=>{t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rep[0],rep[1]);t.colorSpace=srgb?THREE.SRGBColorSpace:THREE.NoColorSpace;t.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());t.needsUpdate=true;res(t);};
   const web=()=>new THREE.TextureLoader().load('assets/textures/'+n+'.webp',set,undefined,()=>res(null));if(K2)K2.load('assets/textures/'+n+'.ktx2',set,undefined,web);else web();});},
@@ -496,4 +496,4 @@ fetch('assets/meshy/manifest.json').then(r=>r.ok?r.json():null).then(mf=>{if(!mf
  for(const[k,f]of Object.entries(mf)){if(k.startsWith('_'))continue;const e=typeof f==='string'?{file:f}:f;const rk=RACEK(k);if(e.opt){fetch('assets/meshy/'+e.file,{method:'HEAD'}).then(r=>{if(r.ok)LOADK(k,e);}).catch(()=>{});}else if(rk)PEND.push([k,e,rk]);else LOADK(k,e);}
  R3D._lazy=races=>{for(let i=PEND.length-1;i>=0;i--)if(races.has(PEND[i][2])){LOADK(PEND[i][0],PEND[i][1]);PEND.splice(i,1);}};}).catch(()=>{});
 window.R3D=R3D;
-const s=document.createElement('script');s.src='ui.js?v=27';document.body.appendChild(s);
+const s=document.createElement('script');s.src='ui.js?v=28';document.body.appendChild(s);
