@@ -1,0 +1,5 @@
+All textures: Poly Haven (https://polyhaven.com), license CC0 1.0 (public domain, no attribution required).
+mossy_cobblestone  https://polyhaven.com/a/mossy_cobblestone   (playfield paving)
+forrest_ground_01  https://polyhaven.com/a/forrest_ground_01   (moss/forest ground, island borders)
+rock_face          https://polyhaven.com/a/rock_face           (cliffs)
+Downloaded 1K JPG maps (diff, nor_gl, rough, ao), converted to KTX2 (diff/rough/ao: ETC1S; normal: UASTC+zstd) and WebP fallbacks.

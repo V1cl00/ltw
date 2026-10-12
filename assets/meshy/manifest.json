@@ -1,5 +1,5 @@
 {
- "_doc": "Meshy-GLBs hier ablegen und eintragen. Schl\u00fcssel = Turm-ID (m_bogen, m_kanone, m_wacht, m_kapelle, m_ballista, mauer, ...). Wert = Dateiname oder {\"file\":\"x.glb\",\"height\":1.6}. Fehlende Dateien werden ignoriert (Platzhalter bleibt).",
+ "_doc": "Meshy-GLBs hier ablegen und eintragen. Schlüssel = Turm-ID (m_bogen, m_kanone, m_wacht, m_kapelle, m_ballista, mauer, ...). Wert = Dateiname oder {\"file\":\"x.glb\",\"height\":1.6}. Fehlende Dateien werden ignoriert (Platzhalter bleibt).",
  "o_speer": {
   "file": "turm_ork.glb",
   "height": 1.15
@@ -119,5 +119,35 @@
  "unit_berserker": {
   "file": "unit_berserker.glb",
   "height": 0.8
+ },
+ "mine_depot": {
+  "file": "mine_depot.glb",
+  "height": 0.6,
+  "opt": 1
+ },
+ "mine_worker": {
+  "file": "mine_worker.glb",
+  "height": 0.34,
+  "opt": 1
+ },
+ "edge_cliff": {
+  "file": "edge_cliff.glb",
+  "height": 1,
+  "opt": 1
+ },
+ "edge_terrace": {
+  "file": "edge_terrace.glb",
+  "height": 1,
+  "opt": 1
+ },
+ "edge_stairs": {
+  "file": "edge_stairs.glb",
+  "height": 1,
+  "opt": 1
+ },
+ "island_under": {
+  "file": "island_under.glb",
+  "height": 6,
+  "opt": 1
  }
 }
