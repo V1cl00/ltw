@@ -43,5 +43,21 @@
   "file": "monument.glb",
   "height": 1,
   "scale": 4
+ },
+ "m_kanone": {
+  "file": "turm_glocke.glb",
+  "height": 1.15
+ },
+ "m_wacht": {
+  "file": "turm_wacht.glb",
+  "height": 1.3
+ },
+ "m_kapelle": {
+  "file": "turm_esse.glb",
+  "height": 1.1
+ },
+ "m_ballista": {
+  "file": "turm_speer.glb",
+  "height": 1.05
  }
 }
