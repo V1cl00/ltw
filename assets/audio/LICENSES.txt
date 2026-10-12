@@ -10,3 +10,4 @@ OpenGameArt.org, CC0:
   music_battle: "Medieval: The Bard's Tale" (loop) by RandomMind https://opengameart.org/content/medieval-the-bards-tale
   ambient_garden: "Forest Ambience" https://opengameart.org/content/forest-ambience
 Credit not required but appreciated.
+  collapse: Kenney Impact Sounds (CC0), impactMining/impactPlate_heavy/impactBell_heavy mixed+pitched with ffmpeg

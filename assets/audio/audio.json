@@ -223,6 +223,16 @@
    "alias": [
     "income_tick"
    ]
+  },
+  "collapse": {
+   "src": [
+    "assets/audio/collapse.ogg",
+    "assets/audio/collapse.mp3"
+   ],
+   "type": "sfx",
+   "loop": false,
+   "volume": 0.8,
+   "duration": 4.0
   }
  }
 }
