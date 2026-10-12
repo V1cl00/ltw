@@ -119,7 +119,8 @@ button:active:not(:disabled){transform:translateY(4px);box-shadow:inset 0 1px 0 
 #ov button.tbtn small{font:13px system-ui;color:#cdbb92;margin-top:4px;opacity:.85}
 #ov button.tbtn::before,#ov button.tbtn::after{display:none!important}
 #ov button.tbtn .ti{position:absolute;left:18px;top:50%;transform:translateY(-50%);font-size:28px;filter:drop-shadow(0 0 6px rgba(242,178,51,.6))}
-</style><style id="theme16">/* ===== Theme v16: Tempelgarten – Gold & Jade, Serifen, Ornament-Panels ===== */
+</style><style id="v23pre">body.pre #stat,body.pre #bot,body.pre #pvpBar,body.pre #bView,body.pre #bPause,body.pre #bSpeed{display:none!important}</style>
+<style id="theme16">/* ===== Theme v16: Tempelgarten – Gold & Jade, Serifen, Ornament-Panels ===== */
 :root{--gold:#e2b55a;--gold2:#fff0b8;--gdk:#7a5520;--jade:#16352e;--jade2:#0d211d;--ink:#0a0f0d;--serif:"Cinzel","Trajan Pro","Palatino Linotype","Book Antiqua",Palatino,Georgia,"Times New Roman",serif}
 body{font-family:var(--serif)!important;background:radial-gradient(120% 80% at 50% 0%,#203a32,#070b09)!important}
 .small,#stat,#tip,input{font-family:system-ui,"Segoe UI",sans-serif}
@@ -161,13 +162,42 @@ button:disabled{filter:grayscale(.6) brightness(.8)}
 #pvpBar button{white-space:nowrap;font-size:11px!important;font-family:var(--serif)!important;border-radius:6px!important;min-height:30px!important;margin:0!important}
 @media (max-width:480px){#stat>span{padding:1px 5px!important}#tabs button{font-size:11px}}
 </style>
+<style id="v23layout">
+/* v23: Haupt-Tabs vertikal links, Kontext-Leiste unten, kein Scrollen */
+#tabs{position:fixed!important;left:6px;top:50%;transform:translateY(-50%);display:flex!important;flex-direction:column!important;gap:6px!important;margin:0!important;z-index:9;padding:6px;border-radius:14px;background:linear-gradient(180deg,rgba(22,44,38,.94),rgba(8,16,14,.95));border:1px solid rgba(226,181,90,.55);box-shadow:0 8px 22px rgba(0,0,0,.5)}
+#tabs button{width:66px!important;min-height:56px!important;flex:none!important}
+#bot{position:fixed!important;left:86px!important;right:8px!important;max-width:none!important;bottom:8px!important;width:auto!important;min-width:0!important;box-sizing:border-box}
+#panel{overflow:hidden!important;flex-wrap:nowrap!important;gap:5px!important}
+#panel>button{flex:1 1 0!important;min-width:0!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#panel>button .small,#panel>button small{overflow:hidden;text-overflow:ellipsis}
+#hI{order:-1}
+@media (max-width:700px){
+ #tabs{left:4px;padding:4px;gap:4px!important}
+ #tabs button{width:52px!important;min-height:48px!important;font-size:10px!important}
+ #tabs button img{width:24px!important;height:24px!important}
+ #bot{left:66px!important;right:4px!important;bottom:4px!important}
+ #panel>button{padding:2px 3px!important;font-size:10px!important}
+ #stat{gap:3px!important;font-size:11px!important}
+ #stat>span:nth-child(n+5){display:none!important}
+ #panel{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));height:auto!important;max-height:none!important}
+ #panel>button{min-height:44px!important}
+ #bHelp{display:none!important}
+ #pvpBar{left:2vw!important;right:2vw!important;transform:none!important;flex-wrap:wrap;justify-content:center;font-size:10px!important}
+ #pvpBar button{padding:1px 6px!important;max-width:30vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ #stat>span:nth-child(4){display:none!important}
+ #bView{display:none!important}
+ #stat>span{padding:1px 4px!important}
+ #top button{min-width:30px!important;padding:2px 3px!important}
+ #sheet{top:auto!important;bottom:76px!important;left:66px!important;right:4px!important;width:auto!important;max-height:52vh!important}
+}
+</style>
 </head><body>
 <div id="top"><div id="stat"></div><button id="bView">👁</button><button id="bQ">Ultra</button><button id="bMute">🔊</button><button id="bHelp">?</button><button id="bPause">⏸</button><button id="bSpeed">1x</button></div>
 <div id="cwrap"><canvas id="cv"></canvas></div>
 <div id="bot"><div id="tabs"><button data-tab="bau"><img src="ui/bau.webp" alt="">Bauen</button><button data-tab="send"><img src="ui/send.webp" alt="">Senden</button><button data-tab="meister"><img src="ui/meister.webp" alt="">Schrein</button><button data-tab="mine" id="tabMine"><img src="ui/mine.webp" alt=""><span>Mine</span></button><button data-tab="held" id="tabHeld"><img src="ui/held.webp" alt=""><span>Held</span></button></div>
 <div id="panel"></div><div id="sheet"></div></div>
 <div id="hint"></div><div id="evb"></div><div id="tip"></div><div id="tut"><div class="box"><div id="tutT"></div><div class="rowb"><button id="tutSkip">Überspringen</button><button id="tutNext">Weiter ▶</button></div></div></div><div id="ov"></div>
-<script src="game.js?v=22"></script>
-<script src="net.js?v=22"></script>
+<script src="game.js?v=23"></script>
+<script src="net.js?v=23"></script>
 <script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
-<script type="module" src="render3d.js?v=22"></script></body></html>
+<script type="module" src="render3d.js?v=23"></script></body></html>

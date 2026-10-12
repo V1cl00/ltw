@@ -98,8 +98,8 @@ let LOC=null;
 function startLocal(n,diff,rc){const Gw=newGame(n),RK=Object.keys(RACE);Gw.diff=diff;Gw.started=1;pickRace(Gw.p[0],rc);Gw.p.forEach((p,i)=>{p.ai=i?1:0;if(i)pickRace(p,PLAYABLE()[Math.floor(Math.random()*PLAYABLE().length)]);});
  LOC={Gw,names:['Du'].concat(Gw.p.slice(1).map((p,i)=>'KI '+(i+1)+' · '+RACE[p.race].n)),watch:null,acc:9,out:new Set()};
  ONL={local:1,playing:true,seq:0,inMatch:1,send(m){if(!LOC)return;if(m.t==='cmd')localCommand(LOC.Gw,0,m.c);else if(m.t==='watch')LOC.watch=m.pi;},ws:{close(){}}};
- G=newGame();G.online=1;G.local=1;for(const p of G.p)p.ai=0;locSync(0);G.started=1;sel=null;selT=null;pending=null;view=0;layout();
- document.documentElement.style.setProperty('--rc',RACE[rc].c2);document.documentElement.style.setProperty('--rc2',RACE[rc].c);AU.sfx('start');AU.scene('battle');tab='bau';$('ov').style.display='none';ui();}
+ G=newGame(n);G.online=1;G.local=1;for(const p of G.p)p.ai=0;locSync(0);G.started=1;sel=null;selT=null;pending=null;view=0;layout();
+ document.documentElement.style.setProperty('--rc',RACE[rc].c2);document.documentElement.style.setProperty('--rc2',RACE[rc].c);AU.sfx('start');AU.scene('battle');tab='bau';$('ov').style.display='none';ui();if(!localStorage.getItem('ltw_tut'))tut(true);}
 function locSync(){const Gw=LOC.Gw,s=NET.serState(Gw,0,LOC.names,LOC.watch);
  for(const e of Gw.ev)if(e.k==='elim'&&!LOC.out.has(e.pi)){LOC.out.add(e.pi);if(e.pi===0)hint(`💀 Ausgeschieden – Platz ${Gw.p[0].place}. Du schaust weiter zu.`,4000);else pop(`💀 ${LOC.names[e.pi]} ist raus (Platz ${Gw.p[e.pi].place})`,'#f99');}
  Gw.ev.length=0;s.over=null;NET.hydrate(G,s,[]);if(selT)selT=G.p[0].towers.find(t=>t.id===selT.id)||null;
@@ -109,7 +109,7 @@ function kiMenu(){$('ov').style.display='flex';$('ov').innerHTML='<div class="bo
  $('ov').querySelectorAll('[data-np]').forEach(b=>b.onclick=()=>{localStorage.setItem('ltw_spn',b.dataset.np);$('ov').querySelectorAll('[data-np]').forEach(x=>x.classList.toggle('sel',x===b));});
  $('ov').querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{G.diff=+b.dataset.d;localStorage.setItem('ltw_diff',G.diff);$('ov').querySelectorAll('[data-d]').forEach(x=>x.classList.toggle('sel',x===b));});
  $('ov').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{race=b.dataset.r;localStorage.setItem('ltw_race',race);$('ov').querySelectorAll('[data-r]').forEach(x=>x.classList.toggle('sel',x===b));$('rdesc').textContent=RACE[race].d;});
- $('ov').querySelector('.box').insertAdjacentHTML('beforeend','<button id="bBack">◀ Zurück</button>');$('bBack').onclick=titleScreen;$('go').onclick=()=>{$('ov').classList.remove('ttl');if(spN()>2)return startLocal(spN(),G.diff,race);pickRace(G.p[0],race);document.documentElement.style.setProperty('--rc',RACE[race].c2);document.documentElement.style.setProperty('--rc2',RACE[race].c);G.started=1;AU.sfx('start');AU.scene('battle');tab='bau';$('ov').style.display='none';ui();if(!localStorage.getItem('ltw_tut'))tut(true);};}
+ $('ov').querySelector('.box').insertAdjacentHTML('beforeend','<button id="bBack">◀ Zurück</button>');$('bBack').onclick=titleScreen;$('go').onclick=()=>{$('ov').classList.remove('ttl');if(ONL&&!ONL.local){try{ONL.ws&&ONL.ws.close();}catch(e){}ONL=null;}return startLocal(spN(),G.diff,race);pickRace(G.p[0],race);document.documentElement.style.setProperty('--rc',RACE[race].c2);document.documentElement.style.setProperty('--rc2',RACE[race].c);G.started=1;AU.sfx('start');AU.scene('battle');tab='bau';$('ov').style.display='none';ui();if(!localStorage.getItem('ltw_tut'))tut(true);};}
 function elDesc(t){const D=elemDef(t);return D?`<span style="color:${D.c}">${D.ico} ${D.n} Lv${D.lv}</span> <span class="small">${D.d}${D.lv>=5&&D.l5?' + Lv5-Bonus':''}${t.buff?' · ✨ Aura':''}</span>`:'<span class="small">Kein Element – im Schrein freischalten, hier gratis wählen</span>';}
 function elemPanel(p,t){const rs=Object.keys(ELEM);return `<div style="flex:1 1 100%;margin-bottom:4px">${elDesc(t)}</div><div class="runes">`+rs.map(e=>{const E=ELEM[e],n=p.runes?.[e]||0,c=n?canSlot(p,t,e):null;
  const lab=!n?'nicht freigeschaltet':!c?'aktiv':'gratis umstellen';
@@ -217,20 +217,20 @@ function infoAt(e){const q=posAt(e);if(!q)return null;const p=G.p[q.pi];let best
 // ===== Ziehen zum Bauen =====
 // Handy: gedrückt halten (300 ms) + ziehen -> Vorschau-Linie; danach Tippen in die Linie baut alle gültigen, Tippen woanders bricht ab.
 // PC: Maus drücken + ziehen + loslassen baut sofort. Kein Konflikt: im Baumodus kein Info-Long-Press und kein 3D-Kameraschwenk (Ausnahme 2 Finger / rechte Maus).
-let dragB=null,line=null,ptrN=0;
+let dragB=null,line=null,ptrN=0;const PN=new Set();
 function lineCells(a,b){const out=[];let x=a.x,y=a.y;while(x!==b.x||y!==b.y){if(Math.abs(b.x-x)>=Math.abs(b.y-y))x+=Math.sign(b.x-x);else y+=Math.sign(b.y-y);out.push({x,y});}return out;}
 function updLine(){if(!dragB)return;const P=planBuild(G.p[0],sel,dragB.cells.map(c=>[c.x,c.y]));line={cells:P.cells,cost:P.cost,n:P.n,type:sel};
  hint(line.cells.length>1?`${P.n}× ${TT[sel].n} · ${P.cost}💰${P.n<line.cells.length?' ('+(line.cells.length-P.n)+' ungültig)':''}${dragB.touch?' – in Linie tippen zum Bauen':''}`:'');}
 function buildLine(){if(!line)return;const ok=line.cells.filter(c=>c.ok).map(c=>[c.x,c.y]);const n=command(G,0,{op:'buildMany',type:line.type,cells:ok});line=null;dragB=null;hint('');
  if(n){AU.sfx('build');if(navigator.vibrate)navigator.vibrate(12);}else AU.sfx('no');ui();}
-cv.addEventListener('pointerdown',e=>{ptrN++;if(ptrN>1||e.button===2||e.button===1){dragB=null;if(R3)R3.lockPan=false;return;}
+cv.addEventListener('pointerdown',e=>{PN.add(e.pointerId);ptrN=PN.size;if(ptrN>1||e.button===2||e.button===1){dragB=null;if(R3)R3.lockPan=false;return;}
  if(!G||!sel||sel==='master'||!TT[sel])return;const c=cellAt(e);if(!c||c.pi!==0)return;if(line)return;// Bestätigung folgt im pointerup
  const touch=e.pointerType!=='mouse';dragB={cells:[c],touch,active:!touch,x0:e.clientX,y0:e.clientY};if(R3)R3.lockPan=true;
  if(touch)dragB.holdT=setTimeout(()=>{if(dragB){dragB.active=true;if(navigator.vibrate)navigator.vibrate(8);updLine();}},300);});
 cv.addEventListener('pointermove',e=>{if(!dragB||ptrN>1)return;if(!dragB.active){if(Math.hypot(e.clientX-dragB.x0,e.clientY-dragB.y0)>10){clearTimeout(dragB.holdT);dragB.active=true;}else return;}
  const c=cellAt(e);if(!c||c.pi!==0)return;const last=dragB.cells[dragB.cells.length-1];if(c.x===last.x&&c.y===last.y)return;
  for(const q of lineCells(last,c))if(!dragB.cells.some(o=>o.x===q.x&&o.y===q.y))dragB.cells.push(q);dragB.moved=1;updLine();});
-addEventListener('pointerup',()=>{ptrN=Math.max(0,ptrN-1);});addEventListener('pointercancel',()=>{ptrN=Math.max(0,ptrN-1);});
+const pnUp=e=>{PN.delete(e.pointerId);ptrN=PN.size;if(!ptrN&&R3)R3.lockPan=false;};addEventListener('pointerup',pnUp);addEventListener('pointercancel',pnUp);addEventListener('blur',()=>{PN.clear();ptrN=0;dragB=null;clearTimeout(lpT);if(R3)R3.lockPan=false;});
 cv.addEventListener('pointerdown',e=>{lpDone=false;lpXY=[e.clientX,e.clientY];clearTimeout(lpT);lpT=setTimeout(()=>{if(!G)return;if(dragB||line)return;const h=infoAt(e);if(!h)return;lpDone=true;const tp=$('tip');tp.innerHTML=h;tp.style.display='block';
  tp.style.left=Math.min(innerWidth-250,Math.max(4,e.clientX-120))+'px';tp.style.top=Math.max(4,e.clientY-tp.offsetHeight-30)+'px';if(navigator.vibrate)navigator.vibrate(15);},500);});
 cv.addEventListener('pointermove',e=>{if(lpXY&&Math.hypot(e.clientX-lpXY[0],e.clientY-lpXY[1])>10)clearTimeout(lpT);});
@@ -439,9 +439,10 @@ function mineGoldFx(g){let sx,sy;if(R3){const q=R3.depot();if(!q)return;[sx,sy]=
 function playEv(){if(!G)return;for(const v of G.ev){if(v.k==='thief'){pop(v.pi===0?`💰 Dieb erbeutet +${v.g}`:`💰 Dieb stiehlt −${v.g}`,v.pi===0?'#fd5':'#f88');AU.sfx('coin');continue;}if(v.k==='ability'){AU.sfx('up');if(v.pi===1)pop((ONL?'Gegner: ':'KI: ')+ABIL[v.a].ico+' '+ABIL[v.a].n,'#ffb0a8');continue;}if(v.k==='minegold'){if(v.pi===0)mineGoldFx(v.g);continue;}if(v.k==='announce'){const E=EVT[v.e];AU.sfx('start');banner(`<b>${E.ico} In 5 s: ${E.n}</b><br><span class="small">${E.d}${E.dur?' · '+E.dur+' s':''}</span>`,4800);continue;}if(v.k==='evstart'){const E=EVT[v.e];AU.sfx('start');AU.duck(1.5,.3);banner(`<b>${E.ico} ${E.n}!</b><br><span class="small">${E.d}</span>`,2500);continue;}if(v.pi!==(both?0:view)&&v.k!=='leak')continue;if(v.k==='shot')AU.sfx(v.ty);else if(v.k==='transform'){if(v.pi===0||both)AU.sfx('transform');if(AU.ctx&&AU.on&&!AU.buf.transform){const f=523*Math.pow(2,(Math.max(1,v.chain)-1)*2/12);AU.tone(f,.12,'triangle',.14,f*2);AU.tone(f*1.5,.18,'sine',.08,0,.05);}if(v.pi===0){AU.sfx('coin');coinFly(0,v.x,v.y);if(v.chain>=3)pop('Licht ×'+v.chain+(v.chain>1?' (+'+5*(v.chain-1)+' % Gold)':''),'#F2B233');}}else if(v.k==='lichtsturm'){if(v.pi===0){if(AU.ctx&&AU.on)[523,659,784,1046].forEach((f,i)=>AU.tone(f,.6,'sine',.12,0,i*.03));banner('<b>✨ Lichtsturm!</b><br><span class="small">Viele Ängste wurden zu Licht. Mehr Mut, mehr Gold!</span>',1800);}}else if(v.k==='kill'){AU.sfx('kill');if(v.pi===0){AU.sfx('coin');coinFly(0,v.x,v.y);}}else if(v.k==='tick'){const e=document.querySelector('#hI');if(e){e.classList.remove('glow');void e.offsetWidth;e.classList.add('glow');}}else if(v.k==='leak'){if(v.pi===0){AU.sfx('leak');pop('−'+v.n+' ❤','#f66');}}else if(v.k==='steal'){if(v.pi===0){AU.sfx('steal');pop('+'+v.n+' ❤ gestohlen','#6f8');}}else AU.sfx(v.k);}G.ev.length=0;}
 function mineHint(){if(G&&G.t>35&&!G.mh&&!localStorage.getItem('ltw_minehint')){G.mh=1;localStorage.setItem('ltw_minehint','1');banner('<b>⛏ Deine Goldmine</b><br><span class="small">Gelbes Feld oben rechts an deiner Bahn oder Tab „Mine“: Arbeiter kaufen bringt Gold/s – antippen zum Einsammeln!</span>',7000);}}
 function tensionCheck(){mineHint();if(!G)return;const p=G.p[0];AU.setTension(!G.over&&(p.creeps.some(c=>c.y>ROWS*.6)||p.lives<=6)?1:0);}
-let loopErr=0;function loop(ts){requestAnimationFrame(loop);try{loopBody(ts);}catch(e){if(loopErr++<5)console.error(e);}}
-function loopBody(ts){tensionCheck();const dt=Math.min(.05,(ts-last)/1000||0);last=ts;shake=Math.max(0,shake-dt);
- if(ONL&&G&&G.started&&!G.over){step(G,dt);if(G.over&&!ONL.over)G.over=null;uiT-=dt;if(uiT<=0){uiT=.25;ui();}playEv();}
+let loopErr=0;function loop(ts){requestAnimationFrame(loop);try{loopBody(ts);}catch(e){if(loopErr++<5)console.error(e);try{if(G)draw();}catch(_){}}}
+window.__ltwLOC=()=>LOC;
+function loopBody(ts){{const o=$('ov'),pre=!G||!G.started||(o.style.display!=='none'&&o.classList.contains('ttl'))||(o.style.display!=='none'&&!G.over&&!(LOC&&LOC.done)&&!!o.querySelector('#go,#tKI,#onB'));if(document.body.classList.contains('pre')!==pre)document.body.classList.toggle('pre',pre);}tensionCheck();const dt=Math.min(.05,(ts-last)/1000||0);last=ts;shake=Math.max(0,shake-dt);
+ if(ONL&&!ONL.local&&G&&G.started&&!G.over){step(G,dt);if(G.over&&!ONL.over)G.over=null;uiT-=dt;if(uiT<=0){uiT=.25;ui();}playEv();}
  else if(G&&!paused&&G.started&&!G.over){if(LOC&&!LOC.done){LOC.sa=Math.min(.25,(LOC.sa||0)+dt*speed);while(LOC.sa>=.05){step(LOC.Gw,.05);LOC.sa-=.05;}LOC.acc+=dt*speed;if(LOC.acc>=.1){LOC.acc=0;locSync();}}for(let i=0;i<speed;i++)step(G,dt);if(LOC&&!LOC.done)G.over=null;uiT-=dt;if(uiT<=0){uiT=.25;ui();}
   playEv();if(G.over&&!G.online){AU.sfx(G.over);$('ov').style.display='flex';$('ov').innerHTML=`<div class="box"><h1>${G.over==='win'?'Sieg! 🏆':'Niederlage 💀'}</h1><p>${G.over==='win'?'Die KI hat alle Leben verloren.':'Du hast alle Leben verloren.'}</p><button id="again">Neues Spiel</button></div>`;$('again').onclick=start;}}
  if(G)draw();}
@@ -487,7 +488,7 @@ function netMsg(o,m){switch(m.t){
  case'eliminated':hint(`💀 Ausgeschieden – Platz ${m.place}. Du kannst weiter zuschauen.`,4000);break;
  case'playerOut':if(m.pi!==o.pi)pop(`💀 ${esc(m.name||'Spieler')} ist raus (Platz ${m.place})`,'#f99');break;
  case'error':if(o.inMatch)hint(ERRN[m.msg]||m.msg,2000);else onlineMenu('⚠ '+(ERRN[m.msg]||m.msg));break;
- case'match':o.inMatch=1;o.over=0;o.pi=m.you;o.code=m.code;if(!G||!G.online||m.phase==='pick'){G=newGame();G.online=1;for(const p of G.p)p.ai=0;sel=null;selT=null;pending=null;view=0;layout();}
+ case'match':o.inMatch=1;o.over=0;o.pi=m.you;o.code=m.code;if(!G||!G.online||m.phase==='pick'){G=newGame(m.size||2);G.online=1;for(const p of G.p)p.ai=0;sel=null;selT=null;pending=null;view=0;layout();}
   if(m.phase==='pick')netPick(o,m);else{G.started=1;o.playing=true;AU.scene('battle');$('ov').style.display='none';}break;
  case'raceOk':{const b=$('go');if(b){b.disabled=true;b.textContent='Warte auf Gegner…';}break;}
  case'phase':if(m.phase==='play'){G.started=1;o.playing=true;AU.scene('battle');tab='bau';$('ov').style.display='none';AU.sfx('start');ui();}break;
