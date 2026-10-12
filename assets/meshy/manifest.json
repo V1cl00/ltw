@@ -3,5 +3,26 @@
  "o_speer": {
   "file": "turm_ork.glb",
   "height": 1.15
+ },
+ "m_bogen": {
+  "file": "turm_laterne.glb",
+  "height": 1.1
+ },
+ "mauer": {
+  "file": "mauer.glb",
+  "height": 0.62
+ },
+ "schrein": {
+  "file": "schrein.glb",
+  "height": 1.5
+ },
+ "goldmine": {
+  "file": "goldmine.glb",
+  "height": 0.95,
+  "pos": [
+   0,
+   0,
+   -0.2
+  ]
  }
 }
