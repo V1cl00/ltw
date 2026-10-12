@@ -213,7 +213,9 @@ button:disabled{filter:grayscale(.6) brightness(.8)}
 .elHint{font-size:12px;opacity:.8;padding:0 6px}
 #ci{position:fixed;display:none;z-index:80;max-width:min(280px,92vw);padding:8px 10px;border-radius:10px;border:1px solid var(--gold);background:linear-gradient(180deg,rgba(24,46,40,.97),rgba(9,18,15,.98));color:#efe6cc;font-size:12px;line-height:1.35;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.5)}#ci .ciR{font-style:normal;font-size:10px;padding:0 4px;border:1px solid #fff4;border-radius:4px;margin-left:3px}#ci .ciD{opacity:.75}
 #panel button[data-dis]{filter:grayscale(.85) brightness(.7);opacity:.75}
-#bQ .qd{font-size:8px;letter-spacing:-1px;margin-left:3px;vertical-align:middle}#bQ .qd i{font-style:normal;opacity:.3}#bQ .qd i.on{opacity:1;color:#FFC93C}@media(max-width:600px){#bQ{font-size:10px!important;padding:2px 5px!important}#bQ .qd{display:block;margin:0}}
+#bQ .qd{font-size:8px;letter-spacing:-1px;margin-left:3px;vertical-align:middle}#bQ .qd i{font-style:normal;opacity:.3}#bQ .qd i.on{opacity:1;color:#FFC93C}@media(max-width:600px){#bQ{font-size:10px!important;padding:2px 6px!important;min-width:0!important;width:auto!important}#bQ .qt{display:none}#bQ .qd{font-size:9px;margin:0}}
+.cdB{position:relative;overflow:hidden}.cdB::after{content:'';position:absolute;inset:0;pointer-events:none;background:conic-gradient(rgba(0,0,0,.55) var(--cdp),transparent 0);border-radius:inherit}
+#cfB{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:90;background:rgba(0,0,0,.45)}#cfB .box{max-width:320px;padding:14px;border-radius:14px;border:1px solid var(--gold);background:linear-gradient(180deg,rgba(24,46,40,.97),rgba(9,18,15,.98));color:#efe6cc;text-align:center;line-height:1.4}#cfB .rowb{display:flex;gap:8px;justify-content:center;margin-top:10px}#cfB button{width:auto;padding:8px 14px}
 </style>
 </head><body>
 <div id="top"><div id="stat"></div><button id="bView">👁</button><button id="bQ">Ultra</button><button id="bMute">🔊</button><button id="bHelp">?</button><button id="bPause">⏸</button><button id="bSpeed">1x</button></div>
@@ -221,7 +223,7 @@ button:disabled{filter:grayscale(.6) brightness(.8)}
 <div id="bot"><div id="tabs"><button data-tab="bau"><img src="ui/bau.webp" alt="">Bauen</button><button data-tab="send"><img src="ui/send.webp" alt="">Senden</button><button data-tab="meister"><img src="ui/meister.webp" alt="">Schrein</button><button data-tab="mine" id="tabMine"><img src="ui/mine.webp" alt=""><span>Mine</span></button><button data-tab="held" id="tabHeld"><img src="ui/held.webp" alt=""><span>Held</span></button></div>
 <div id="panel"></div><div id="sheet"></div></div>
 <div id="hint"></div><div id="evb"></div><div id="tip"></div><div id="tut"><div class="box"><div id="tutT"></div><div class="rowb"><button id="tutSkip">Überspringen</button><button id="tutNext">Weiter ▶</button></div></div></div><div id="ov"></div>
-<script src="game.js?v=28"></script>
-<script src="net.js?v=28"></script>
+<script src="game.js?v=29"></script>
+<script src="net.js?v=29"></script>
 <script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
-<script type="module" src="render3d.js?v=28"></script></body></html>
+<script type="module" src="render3d.js?v=29"></script></body></html>

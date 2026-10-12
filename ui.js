@@ -132,7 +132,7 @@ const IC=(()=>{const S=(d,f)=>`<svg class="ic" viewBox="0 0 16 16"><g fill="${f|
   mine:S('<path d="M3 13l7-7M7 3q5 0 7 5-3-3-7-5z" fill="#7a5520"/>')};})();
 function ui(){if(!G)return;if(tab!=='bau'&&sel&&TT[sel]){sel=null;pending=null;window.__exitBuild&&__exitBuild();}const p=G.p[0],o=G.p[1];pvpBar();
  const mine=p.creeps.length,deep=p.creeps.some(c=>c.y>ROWS*.6),theirs=o.creeps.length;
- $('stat').innerHTML=`<span id="hG">${IC.gold}<b class="cG">${Math.floor(p.gold)}</b></span><span id="hI">${IC.inc}<b class="cI">+${p.income}</b><span class="incT"><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="#fff3" stroke-width="2.5"/><circle cx="8" cy="8" r="6" fill="none" stroke="#FFC93C" stroke-width="2.5" stroke-dasharray="37.7" stroke-dashoffset="${(37.7*Math.max(0,Math.min(1,G.tick/(G.tickLen||10)))).toFixed(1)}" transform="rotate(-90 8 8)"/></svg> in ${Math.max(0,Math.ceil(G.tick))}s</span></span><span>${IC.heart}<b class="cL">${p.lives}</b></span><span>${IC.foe}<b style="color:#e99">${o.lives}</b></span><span class="${deep?'alarm':''}" title="Gegner auf deiner Bahn">${IC.sword}<b>${mine}</b></span><span title="Deine Kreaturen bei der KI">${IC.send}<b>${theirs}</b></span><span>${IC.mine}<b class="cG">${p.mine.w}</b></span>${G.evt&&G.et<G.evt.end?`<span style="color:#c9f">${EVT[G.evt.k].ico}${Math.ceil(G.evt.end-G.et)}s</span>`:''}`;
+ $('stat').innerHTML=`<span id="hG">${IC.gold}<b class="cG">${Math.floor(p.gold)}</b></span><span id="hI">${IC.inc}<b class="cI">+${Math.round(p.income)}</b><span class="incT"><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="#fff3" stroke-width="2.5"/><circle cx="8" cy="8" r="6" fill="none" stroke="#FFC93C" stroke-width="2.5" stroke-dasharray="37.7" stroke-dashoffset="${(37.7*Math.max(0,Math.min(1,G.tick/(G.tickLen||10)))).toFixed(1)}" transform="rotate(-90 8 8)"/></svg> in ${Math.max(0,Math.ceil(G.tick))}s</span></span><span>${IC.heart}<b class="cL">${p.lives}</b></span><span>${IC.foe}<b style="color:#e99">${o.lives}</b></span><span class="${deep?'alarm':''}" title="Gegner auf deiner Bahn">${IC.sword}<b>${mine}</b></span><span title="Deine Kreaturen bei der KI">${IC.send}<b>${theirs}</b></span><span title="Durchbrüche: Leben, die du Gegnern genommen hast">💔<b style="color:#ffb0b0">${p.stolen||0}</b></span><span>${IC.mine}<b class="cG">${p.mine.w}</b></span>${G.evt&&G.et<G.evt.end?`<span style="color:#c9f">${EVT[G.evt.k].ico}${Math.ceil(G.evt.end-G.et)}s</span>`:''}`;
  if(pumpG){const e=document.querySelector('#hG');e&&e.classList.add('pump');pumpG=0;}if(glowI){const e=document.querySelector('#hI');e&&e.classList.add('glow');glowI=0;}
  {const e=$('tabMine').querySelector('span');if(e)e.textContent='Mine'+(p.mine.w?' ('+p.mine.w+')':'');else $('tabMine').textContent='⛏ Mine'+(p.mine.w?' ('+p.mine.w+')':'');}
  $('bView').textContent=view===0?`👁${ONL?'Gegner':'KI'} ${theirs}`:`👁Ich ${mine}${deep?'⚠':''}`;$('bView').classList.toggle('alarm',view===1&&deep);
@@ -153,15 +153,17 @@ function ui(){if(!G)return;if(tab!=='bau'&&sel&&TT[sel]){sel=null;pending=null;w
  else if(tab==='mine'){const M=p.mine,L=MINE[M.lvl],nx=MINE[M.lvl+1];
   h=`<div class="small" style="min-width:120px;align-self:center">⛏ ${M.w} Arbeiter liefern automatisch<br>≈${(L.y*M.w).toFixed(1)}💰/s</div>`+
    `<button data-act="worker" ${M.w>=L.cap||p.gold<workerCost(p)?'disabled':''}><span class="ico">👷</span>Arbeiter ${M.w}/${L.cap}<span class="small">${M.w>=L.cap?'voll':workerCost(p)+'💰 · +'+L.y+'/s'}</span></button>`+
-   `<button data-act="mineup" ${!nx||p.gold<nx.cost?'disabled':''}><span class="ico">🏗</span>Mine Stufe ${M.lvl+1}/3<span class="small">${nx?'Ausbau '+nx.cost+'💰 → '+nx.cap+' Arb.'+(nx.auto?', Auto':''):'max'}</span></button>`+
+   `<button data-act="mineup" ${!nx||p.gold<nx.cost?'disabled':''}><span class="ico">🏗</span>Mine Lv ${M.lvl+1}/3<span class="small">${nx?nx.cost+'💰 · '+nx.cap+' Arb.':'max'}</span></button>`+
    `<div class="small" style="align-self:center;min-width:110px">Ertrag ${(M.w*L.y).toFixed(1)}💰/s<br>KI: ${G.p[1].mine.w} Arb.</div>`;}
- else if(tab==='held'){const H=p.hero;h=!H?'<div class="small">Kein Held</div>':`<div class="small" style="min-width:110px;align-self:center"><b style="color:${H.c}">🦸 ${H.n}</b> Stufe ${H.lvl}/10<br>XP ${H.lvl>=10?'max':Math.floor(H.xp)+'/'+heroXpNeed(H.lvl)} · ⚔ ${heroStats(H).dmg}</div>`+
-  H.ab.map((k,i)=>{const A=ABIL[k],cd=Math.max(0,H.cd[i]-G.t);return `<button data-act="abil" data-i="${i}" ${cd>0?'disabled':''} title="${A.d}"><span class="ico">${A.ico}</span>${A.n}<span class="small">${cd>0?'⏳ '+Math.ceil(cd)+'s':A.d}</span></button>`;}).join('')+
+ else if(tab==='held'){const H=p.hero;h=!H?'<div class="small">Kein Held</div>':`<div class="small" style="min-width:110px;align-self:center"><b style="color:${H.c}">🦸 ${H.n}</b> Lv ${H.lvl}/10<br>XP ${H.lvl>=10?'max':Math.floor(H.xp)+'/'+heroXpNeed(H.lvl)} · ⚔ ${heroStats(H).dmg}</div>`+
+  H.ab.map((k,i)=>{const A=ABIL[k],cd=Math.max(0,H.cd[i]-G.t);return `<button data-act="abil" data-i="${i}" class="cdB" style="--cdp:${cd>0?Math.round(cd/A.cd*100):0}%" ${cd>0?'disabled':''} title="${A.d}"><span class="ico">${A.ico}</span>${A.n}<span class="small">${cd>0?'⏳ '+Math.ceil(cd)+'s':A.d}</span></button>`;}).join('')+
   `<button data-act="hmove" class="${heroMv?'sel':''}"><span class="ico">👣</span>Bewegen<span class="small">${heroMv?'Feld antippen…':'dann Feld tippen'}</span></button>`;}
  else{h=schreinPanel(p);}
+ if(tab==='mine'&&!(selT&&p.towers.includes(selT))){const n=p.bless||0,c=BLESS.cost(n);h+=n>=BLESS.max||p.lives>=BLESS.cap?`<button disabled><span class="ico">🙏</span>Tempelsegen<span class="small">${n>=BLESS.max?'erschöpft':'❤ voll ('+BLESS.cap+')'}</span></button>`:`<button data-act="bless" ${p.gold<c?'data-dis="1"':''} title="+${BLESS.lives} ❤ (${n}/${BLESS.max})"><span class="ico">🙏</span>Segen +${BLESS.lives}❤<span class="small">${c}💰 · ${n}/${BLESS.max}</span></button>`;}
  // nur neu rendern wenn sich etwas ändert (stabile Buttons für Touch)
  if(h!==lastP){$('panel').innerHTML=h;lastP=h;}if(sh!==lastS){$('sheet').innerHTML=sh;lastS=sh;}
  $('panel').style.visibility=sh?'hidden':'visible';$('sheet').style.display=sh?'flex':'none';}
+function confirmBox(html,yes,fn){let d=$('cfB');if(!d){d=document.createElement('div');d.id='cfB';document.body.appendChild(d);}d.innerHTML=`<div class="box">${html}<div class="rowb"><button id="cfY">${yes}</button><button id="cfN">Abbrechen</button></div></div>`;d.style.display='flex';$('cfY').onclick=()=>{d.style.display='none';fn();};$('cfN').onclick=()=>{d.style.display='none';};}
 function act(e){const b=e.target.closest('[data-act]');if(!b||b.disabled||b.dataset.dis){return;}if((window.__ciUsed&&(e.target.closest('#panel')))){window.__ciUsed=0;return;}const p=G.p[0],a=b.dataset.act;
  if(a==='sto'){const i=+b.dataset.i;command(G,0,{op:'sendTo',to:i<0?null:i});p.sendTo=i<0?null:i;if(ONL)ONL.send({t:'watch',pi:i<0?null:i});ui();return;}
  if(a==='bsel'){sel=sel===b.dataset.t?null:b.dataset.t;pending=null;hint('');if(sel&&!both&&view)view=0,layout();}
@@ -171,7 +173,8 @@ function act(e){const b=e.target.closest('[data-act]');if(!b||b.disabled||b.data
  else if(a==='hmove'){heroMv=!heroMv;sel=null;pending=null;if(heroMv&&view)view=0,layout();}
  else if(a==='worker'){if(command(G,0,{op:'worker'}))AU.sfx('build');}
  else if(a==='mineup'){if(command(G,0,{op:'mineUp'}))AU.sfx('up');}
- else if(a==='rune'){if(command(G,0,{op:'buyRune',e:b.dataset.e}))AU.sfx('coin');}
+ else if(a==='rune'){const e=b.dataset.e,E=ELEM[e];confirmBox(`<b style="color:${E.c}">${E.ico} ${E.n}</b> freischalten?<br><span class="small">${E.role} · ${E.d}</span><br><span class="small">Die Wahl ist endgültig (max. 2 Elemente).</span>`,`Freischalten · ${RUNE_COST}💰`,()=>{if(command(G,0,{op:'buyRune',e}))AU.sfx('coin');ui();});}
+  else if(a==='bless'){if(command(G,0,{op:'bless'})){AU.sfx('up');pop('🙏 Tempelsegen +'+BLESS.lives+' ❤','#FFC93C');}}
  else if(a==='slot'){const k=command(G,0,{op:'slotRune',id:selT.id,e:b.dataset.e});if(k){AU.sfx('up');const D=elemDef(selT);pop((k==='fuse'?'Fusion: ':'')+D.ico+' '+D.n+' Lv'+D.lv,D.c);}}
  else if(a==='mup'){if(command(G,0,{op:'masterUp'}))AU.sfx('up');}
  else if(a==='up'){if(command(G,0,{op:'upgrade',id:selT.id,path:0}))AU.sfx('up');}
@@ -228,7 +231,7 @@ function pvpBar(){let b=$('pvpBar');if(!G||!G.online||!G.others){if(b)b.remove()
 function heroMark(x,y){for(let j=0;j<14;j++){const a=j/14*6.283;G.fx.push({k:'part',pi:0,x:x+.5+Math.cos(a)*.42,y:y+.5+Math.sin(a)*.42,vx:0,vy:0,t:1.1,c:j%2?'#7CF7FF':'#FFF6E0'});}G.fx.push({k:'part',pi:0,x:x+.5,y:y+.5,vx:0,vy:0,t:1.1,c:'#7CF7FF'});}
 function infoAt(e){const q=posAt(e);if(!q)return null;const p=G.p[q.pi];let best=null,bd=.8;for(const c of p.creeps){const d=Math.hypot(c.x-q.fx,c.y-q.fy);if(d<bd){bd=d;best=c;}}
  if(best){const c=best,ct=c.ct;return `<b style="color:${ct.c}">${ct.n}</b><br>LP ${Math.ceil(c.hp)}/${Math.ceil(c.max)} · Tempo ${ct.sp}<br>${c.fly?'✈ Fliegt (ignoriert Labyrinth)<br>':''}${c.camo?'👁 Getarnt – nur Türme mit Tarnungserkennung<br>':''}${c.armor?'🛡 Gepanzert – −60% phys., −30% magisch<br>':''}${ct.heal?'✚ Heilt Nachbarn<br>':''}Lichtlohn ${c.bounty}💰 (= Einkommen des Senders)`;}
- const H=p.hero;if(H&&Math.hypot(q.fx-H.x,q.fy-H.y)<.75){const S=heroStats(H);return `<b style="color:${H.c}">🦸 ${H.n}</b> Stufe ${H.lvl}/10<br>Schaden ${S.dmg} · RW ${S.rng.toFixed(1)}<br>${H.ab.map(k=>ABIL[k].ico+' '+ABIL[k].n+': '+ABIL[k].d).join('<br>')}<br><span class="small">Antippen → Held-Menü, Bewegen</span>`;}
+ const H=p.hero;if(H&&Math.hypot(q.fx-H.x,q.fy-H.y)<.75){const S=heroStats(H);return `<b style="color:${H.c}">🦸 ${H.n}</b> Lv ${H.lvl}/10<br>Schaden ${S.dmg} · RW ${S.rng.toFixed(1)}<br>${H.ab.map(k=>ABIL[k].ico+' '+ABIL[k].n+': '+ABIL[k].d).join('<br>')}<br><span class="small">Antippen → Held-Menü, Bewegen</span>`;}
  const t=p.grid[Math.floor(q.fy)][Math.floor(q.fx)];if(!t)return null;
  if(t.master)return `<b style="color:${MT[p.master].c}">★ ${MT[p.master].n}</b> Stufe ${p.mLvl}<br>${MT[p.master].d}<br><span class="small">${mDesc(p.master,p.mLvl)}</span>`;
  const T=TT[t.type],s=tStats(t);if(T.wall)return '<b>Mauer</b><br>Blockiert nur den Weg.';
@@ -274,9 +277,9 @@ if(command(G,0,{op:'heroMove',x:c.x,y:c.y})){heroMark(c.x,c.y);AU.sfx('hero');}}
  const t=p.grid[c.y][c.x];if(t){selT=t;sel=null;pending=null;hint('');ui();return;}
  if(!sel){selT=null;ui();return;}
  const touch=e.pointerType!=='mouse';
- if(touch&&!(pending&&pending.x===c.x&&pending.y===c.y)){pending=c;return;}// nur grüne/rote Feldvorschau, kein Text
+ if(touch&&!(pending&&pending.x===c.x&&pending.y===c.y)){pending=c;if(sel!=='master'&&TT[sel]&&!canPlace(p,c.x,c.y)){hint('⛔ Weg blockiert',1200);AU.sfx('no');}return;}// nur grüne/rote Feldvorschau, kein Text
  pending=null;const ok=sel==='master'?command(G,0,{op:'placeMaster',x:c.x,y:c.y}):command(G,0,{op:'build',type:sel,x:c.x,y:c.y});
- if(ok){if(navigator.vibrate)navigator.vibrate(10);AU.sfx(sel==='master'?'start':'build');if(sel==='master'){sel=null;hint('');}else hint('');}else{hint(TT[sel]?.max&&wallCount(p)>=TT[sel].max?'Maximal '+TT[sel].max+' Mauern':p.gold<(TT[sel]?.cost||0)?'Nicht genug Gold':'Weg darf nicht blockiert werden!',1200);shake=.2;AU.sfx('no');}ui();});
+ if(ok){if(navigator.vibrate)navigator.vibrate(10);AU.sfx(sel==='master'?'start':'build');if(sel==='master'){sel=null;hint('');}else hint('');}else{hint(TT[sel]?.max&&wallCount(p)>=TT[sel].max?'Maximal '+TT[sel].max+' Mauern':p.gold<(TT[sel]?.cost||0)?'Nicht genug Gold':'⛔ Weg blockiert',1200);shake=.2;AU.sfx('no');}ui();});
 // ===== 2D-Renderer: zeichnet nur aus getSnapshot() + UI-Zustand =====
 let pumpG=0,glowI=0;
 const PAL={ground:['#4a4a3c','#46463a'],path:'#7b6a4c',pathEdge:'#5e5038',own:'#4d8fe0',foe:'#e05050'};
