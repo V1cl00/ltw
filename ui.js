@@ -80,7 +80,7 @@ function start(){G=newGame();G.diff=+(localStorage.getItem('ltw_diff')??1);sel=n
  $('ov').style.display='flex';$('ov').innerHTML='<div class="box"><h3>Schwierigkeit</h3><div class="rowb" id="diffs">'+['Leicht','Normal','Schwer'].map((d,i)=>`<button data-d="${i}" class="${G.diff===i?'sel':''}" style="display:inline-block;width:auto;flex:1">${d}</button>`).join('')+'</div><h3>Rasse</h3><div class="rowb" id="races" style="flex-wrap:wrap">'+Object.entries(RACE).map(([k,R])=>`<button data-r="${k}" class="${k===race?'sel':''}" style="display:inline-block;width:auto;flex:1 1 30%;border-color:${R.c};background:linear-gradient(${R.c}55,${R.c}22)"><b style="color:${R.c2}">${R.n}</b><br><span class="small">${R.hero.n}</span></button>`).join('')+'</div><p class="small" id="rdesc">'+RACE[race].d+'</p><button id="go"><b>▶ Spiel starten</b></button></div>';
  $('ov').querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{G.diff=+b.dataset.d;localStorage.setItem('ltw_diff',G.diff);$('ov').querySelectorAll('[data-d]').forEach(x=>x.classList.toggle('sel',x===b));});
  $('ov').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{race=b.dataset.r;localStorage.setItem('ltw_race',race);$('ov').querySelectorAll('[data-r]').forEach(x=>x.classList.toggle('sel',x===b));$('rdesc').textContent=RACE[race].d;});
- $('go').onclick=()=>{pickRace(G.p[0],race);document.documentElement.style.setProperty('--rc',RACE[race].c2);document.documentElement.style.setProperty('--rc2',RACE[race].c);G.started=1;AU.sfx('start');tab='bau';$('ov').style.display='none';ui();if(!localStorage.getItem('ltw_tut'))tut(true);};}
+ onlineBtn();$('go').onclick=()=>{pickRace(G.p[0],race);document.documentElement.style.setProperty('--rc',RACE[race].c2);document.documentElement.style.setProperty('--rc2',RACE[race].c);G.started=1;AU.sfx('start');tab='bau';$('ov').style.display='none';ui();if(!localStorage.getItem('ltw_tut'))tut(true);};}
 function elDesc(t){const D=elemDef(t);return D?`<span style="color:${D.c}">${D.ico} ${D.n} Lv${D.lv}</span> <span class="small">${D.d}${D.lv>=5&&D.l5?' + Lv5-Bonus':''}${t.buff?' · ✨ Aura':''}</span>`:'<span class="small">Kein Element – im Schrein freischalten, hier gratis wählen</span>';}
 function elemPanel(p,t){const rs=Object.keys(ELEM);return `<div style="flex:1 1 100%;margin-bottom:4px">${elDesc(t)}</div><div class="runes">`+rs.map(e=>{const E=ELEM[e],n=p.runes?.[e]||0,c=n?canSlot(p,t,e):null;
  const lab=!n?'nicht freigeschaltet':!c?'aktiv':'gratis umstellen';
@@ -92,7 +92,7 @@ function mDesc(k,l){const s=mStats(k,l);if(k==='blitzmeister')return `${s.target
 let lastP='',lastS='';
 function ui(){if(!G)return;const p=G.p[0],o=G.p[1];
  const mine=p.creeps.length,deep=p.creeps.some(c=>c.y>ROWS*.6),theirs=o.creeps.length;
- $('stat').innerHTML=`<span id="hG">💰<b class="cG">${Math.floor(p.gold)}</b></span><span id="hI">📈<b class="cI">+${p.income}</b><span class="incT"><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="#fff3" stroke-width="2.5"/><circle cx="8" cy="8" r="6" fill="none" stroke="#FFC93C" stroke-width="2.5" stroke-dasharray="37.7" stroke-dashoffset="${(37.7*Math.max(0,Math.min(1,G.tick/(G.tickLen||10)))).toFixed(1)}" transform="rotate(-90 8 8)"/></svg> in ${Math.max(0,Math.ceil(G.tick))}s</span></span><span>❤<b class="cL">${p.lives}</b></span><span>KI❤<b style="color:#e99">${o.lives}</b></span><span class="${deep?'alarm':''}" title="Gegner auf deiner Bahn">⚔<b>${mine}</b></span><span title="Deine Kreaturen bei der KI">➜<b>${theirs}</b></span><span>⛏<b class="cG">${p.mine.w}</b></span>${G.evt&&G.et<G.evt.end?`<span style="color:#c9f">${EVT[G.evt.k].ico}${Math.ceil(G.evt.end-G.et)}s</span>`:''}`;
+ $('stat').innerHTML=`<span id="hG">💰<b class="cG">${Math.floor(p.gold)}</b></span><span id="hI">📈<b class="cI">+${p.income}</b><span class="incT"><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="#fff3" stroke-width="2.5"/><circle cx="8" cy="8" r="6" fill="none" stroke="#FFC93C" stroke-width="2.5" stroke-dasharray="37.7" stroke-dashoffset="${(37.7*Math.max(0,Math.min(1,G.tick/(G.tickLen||10)))).toFixed(1)}" transform="rotate(-90 8 8)"/></svg> in ${Math.max(0,Math.ceil(G.tick))}s</span></span><span>❤<b class="cL">${p.lives}</b></span><span>${ONL?"⚔":"KI"}❤<b style="color:#e99">${o.lives}</b></span><span class="${deep?'alarm':''}" title="Gegner auf deiner Bahn">⚔<b>${mine}</b></span><span title="Deine Kreaturen bei der KI">➜<b>${theirs}</b></span><span>⛏<b class="cG">${p.mine.w}</b></span>${G.evt&&G.et<G.evt.end?`<span style="color:#c9f">${EVT[G.evt.k].ico}${Math.ceil(G.evt.end-G.et)}s</span>`:''}`;
  if(pumpG){const e=document.querySelector('#hG');e&&e.classList.add('pump');pumpG=0;}if(glowI){const e=document.querySelector('#hI');e&&e.classList.add('glow');glowI=0;}
  {const e=$('tabMine').querySelector('span');if(e)e.textContent='Mine'+(p.mine.w?' ('+p.mine.w+')':'');else $('tabMine').textContent='⛏ Mine'+(p.mine.w?' ('+p.mine.w+')':'');}
  $('bView').textContent=view===0?`👁KI ${theirs}`:`👁Ich ${mine}${deep?'⚠':''}`;$('bView').classList.toggle('alarm',view===1&&deep);
@@ -141,8 +141,8 @@ function act(e){const b=e.target.closest('[data-act]');if(!b||b.disabled)return;
 document.addEventListener('click',e=>{if(e.target.closest('button')&&!e.target.closest('[data-act=send],[data-act=up],[data-act=mup],[data-act=sell]'))AU.sfx('tap');});
 $('panel').onclick=act;$('sheet').onclick=act;
 $('tabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;tab=b.dataset.tab;selT=null;ui();};
-$('bPause').onclick=()=>{paused=!paused;$('bPause').textContent=paused?'▶':'⏸';};
-$('bSpeed').onclick=()=>{speed=speed===1?2:1;$('bSpeed').textContent=speed+'x';};
+$('bPause').onclick=()=>{if(ONL)return;paused=!paused;$('bPause').textContent=paused?'▶':'⏸';};
+$('bSpeed').onclick=()=>{if(ONL)return;speed=speed===1?2:1;$('bSpeed').textContent=speed+'x';};
 $('bMute').textContent=AU.on?'🔊':'🔇';$('bMute').onclick=()=>{AU.init();AU.toggle();$('bMute').textContent=AU.on?'🔊':'🔇';};
 $('bHelp').onclick=()=>tut(true);
 $('bView').onclick=()=>{view=1-view;layout();ui();};
@@ -330,7 +330,7 @@ function draw(){if(R3){{const pv=sel?(pending||hover):null;R3.render(getSnapshot
  S.lanes.forEach((L,pi)=>{const Ly=lanes[pi];if(!Ly)return;const{ox,oy}=Ly,X=v=>ox+v*CS,Y=v=>oy+v*CS;
   // Kopfzeile: Titel + Goldmine
   {const M=L.mine,bx=ox+COLS*CS-78;cx.fillStyle='#3a2a12';cx.fillRect(bx,2,78,HD-4);cx.strokeStyle='#FFC93C';cx.lineWidth=1.5;cx.strokeRect(bx+.5,2.5,77,HD-5);cx.fillStyle='#FFC93C';cx.font='bold 12px system-ui';cx.fillText(`⛏${M.w} ${M.gps.toFixed(1)}/s`,bx+4,HD-8);drawMine(ox,HD+ROWS*CS+3,COLS*CS*.73,MH-6,M,now);drawSchrein(ox+COLS*CS*.74,HD+ROWS*CS+3,COLS*CS*.26,MH-6,L,now);}
-  cx.fillStyle=pi?'#ffb0a8':'#bcd6ff';cx.font='bold 12px system-ui';cx.fillText(pi?`KI · ${L.race?RACE[L.race].n:'?'}${L.mode==='def'?' 🛡':' 💰'}`:'Deine Bahn'+(L.race?' · '+RACE[L.race].n:''),ox,HD-9);
+  cx.fillStyle=pi?'#ffb0a8':'#bcd6ff';cx.font='bold 12px system-ui';cx.fillText(pi?`${ONL?"Gegner":"KI"} · ${L.race?RACE[L.race].n:'?'}${L.mode==='def'?' 🛡':' 💰'}`:'Deine Bahn'+(L.race?' · '+RACE[L.race].n:''),ox,HD-9);
   // Boden gedämpft, Pfad hell
   for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){cx.fillStyle=PAL.ground[(x+y)&1];cx.fillRect(X(x),Y(y),CS,CS);}
   cx.fillStyle=PAL.path;for(const[x,y]of L.path)cx.fillRect(X(x)+1,Y(y)+1,CS-2,CS-2);
@@ -383,12 +383,57 @@ function banner(h,ms){const b=$('evb');b.innerHTML=h;b.style.display='block';cle
 function mineGoldFx(g){let sx,sy;if(R3){const q=R3.depot();if(!q)return;[sx,sy]=q;}else{const L=lanes[0];if(!L)return;const r=cv.getBoundingClientRect();sx=r.left+(L.ox+COLS*CS*.6)*(r.width/Wc);sy=r.top+(HD+ROWS*CS+MH-26)*(r.height/Hc);}
  AU.sfx('coin');const d=document.createElement('div');d.textContent='+'+g+' 💰';d.style.cssText=`position:fixed;left:${sx}px;top:${sy}px;transform:translate(-50%,-50%);color:#FFC93C;font:bold 16px system-ui;text-shadow:0 0 3px #000,0 1px 0 #000;pointer-events:none;z-index:50;transition:transform .9s ease-out,opacity .9s`;document.body.appendChild(d);
  requestAnimationFrame(()=>{d.style.transform='translate(-50%,-180%)';d.style.opacity='0';});setTimeout(()=>d.remove(),950);flyFrom(sx,sy);}
-function playEv(){if(!G)return;for(const v of G.ev){if(v.k==='thief'){pop(v.pi===0?`💰 Dieb erbeutet +${v.g}`:`💰 Dieb stiehlt −${v.g}`,v.pi===0?'#fd5':'#f88');AU.sfx('coin');continue;}if(v.k==='ability'){AU.sfx('up');if(v.pi===1)pop('KI: '+ABIL[v.a].ico+' '+ABIL[v.a].n,'#ffb0a8');continue;}if(v.k==='minegold'){if(v.pi===0)mineGoldFx(v.g);continue;}if(v.k==='announce'){const E=EVT[v.e];AU.sfx('start');banner(`<b>${E.ico} In 5 s: ${E.n}</b><br><span class="small">${E.d}${E.dur?' · '+E.dur+' s':''}</span>`,4800);continue;}if(v.k==='evstart'){const E=EVT[v.e];AU.sfx('start');AU.duck(1.5,.3);banner(`<b>${E.ico} ${E.n}!</b><br><span class="small">${E.d}</span>`,2500);continue;}if(v.pi!==(both?0:view)&&v.k!=='leak')continue;if(v.k==='shot')AU.sfx(v.ty);else if(v.k==='transform'){if(AU.ctx&&AU.on){const f=523*Math.pow(2,(Math.max(1,v.chain)-1)*2/12);AU.tone(f,.12,'triangle',.14,f*2);AU.tone(f*1.5,.18,'sine',.08,0,.05);}if(v.pi===0){AU.sfx('coin');coinFly(0,v.x,v.y);if(v.chain>=3)pop('Licht ×'+v.chain+(v.chain>1?' (+'+5*(v.chain-1)+' % Gold)':''),'#F2B233');}}else if(v.k==='lichtsturm'){if(v.pi===0){if(AU.ctx&&AU.on)[523,659,784,1046].forEach((f,i)=>AU.tone(f,.6,'sine',.12,0,i*.03));banner('<b>✨ Lichtsturm!</b><br><span class="small">Viele Ängste wurden zu Licht. Mehr Mut, mehr Gold!</span>',1800);}}else if(v.k==='kill'){AU.sfx('kill');if(v.pi===0){AU.sfx('coin');coinFly(0,v.x,v.y);}}else if(v.k==='tick'){const e=document.querySelector('#hI');if(e){e.classList.remove('glow');void e.offsetWidth;e.classList.add('glow');}}else if(v.k==='leak'){if(v.pi===0){AU.sfx('leak');pop('−'+v.n+' ❤','#f66');}}else if(v.k==='steal'){if(v.pi===0){AU.sfx('steal');pop('+'+v.n+' ❤ gestohlen','#6f8');}}else AU.sfx(v.k);}G.ev.length=0;}
+function playEv(){if(!G)return;for(const v of G.ev){if(v.k==='thief'){pop(v.pi===0?`💰 Dieb erbeutet +${v.g}`:`💰 Dieb stiehlt −${v.g}`,v.pi===0?'#fd5':'#f88');AU.sfx('coin');continue;}if(v.k==='ability'){AU.sfx('up');if(v.pi===1)pop((ONL?'Gegner: ':'KI: ')+ABIL[v.a].ico+' '+ABIL[v.a].n,'#ffb0a8');continue;}if(v.k==='minegold'){if(v.pi===0)mineGoldFx(v.g);continue;}if(v.k==='announce'){const E=EVT[v.e];AU.sfx('start');banner(`<b>${E.ico} In 5 s: ${E.n}</b><br><span class="small">${E.d}${E.dur?' · '+E.dur+' s':''}</span>`,4800);continue;}if(v.k==='evstart'){const E=EVT[v.e];AU.sfx('start');AU.duck(1.5,.3);banner(`<b>${E.ico} ${E.n}!</b><br><span class="small">${E.d}</span>`,2500);continue;}if(v.pi!==(both?0:view)&&v.k!=='leak')continue;if(v.k==='shot')AU.sfx(v.ty);else if(v.k==='transform'){if(AU.ctx&&AU.on){const f=523*Math.pow(2,(Math.max(1,v.chain)-1)*2/12);AU.tone(f,.12,'triangle',.14,f*2);AU.tone(f*1.5,.18,'sine',.08,0,.05);}if(v.pi===0){AU.sfx('coin');coinFly(0,v.x,v.y);if(v.chain>=3)pop('Licht ×'+v.chain+(v.chain>1?' (+'+5*(v.chain-1)+' % Gold)':''),'#F2B233');}}else if(v.k==='lichtsturm'){if(v.pi===0){if(AU.ctx&&AU.on)[523,659,784,1046].forEach((f,i)=>AU.tone(f,.6,'sine',.12,0,i*.03));banner('<b>✨ Lichtsturm!</b><br><span class="small">Viele Ängste wurden zu Licht. Mehr Mut, mehr Gold!</span>',1800);}}else if(v.k==='kill'){AU.sfx('kill');if(v.pi===0){AU.sfx('coin');coinFly(0,v.x,v.y);}}else if(v.k==='tick'){const e=document.querySelector('#hI');if(e){e.classList.remove('glow');void e.offsetWidth;e.classList.add('glow');}}else if(v.k==='leak'){if(v.pi===0){AU.sfx('leak');pop('−'+v.n+' ❤','#f66');}}else if(v.k==='steal'){if(v.pi===0){AU.sfx('steal');pop('+'+v.n+' ❤ gestohlen','#6f8');}}else AU.sfx(v.k);}G.ev.length=0;}
 function mineHint(){if(G&&G.t>35&&!G.mh&&!localStorage.getItem('ltw_minehint')){G.mh=1;localStorage.setItem('ltw_minehint','1');banner('<b>⛏ Deine Goldmine</b><br><span class="small">Gelbes Feld oben rechts an deiner Bahn oder Tab „Mine“: Arbeiter kaufen bringt Gold/s – antippen zum Einsammeln!</span>',7000);}}
 function tensionCheck(){mineHint();if(!G)return;const p=G.p[0];AU.setTension(!G.over&&(p.creeps.some(c=>c.y>ROWS*.6)||p.lives<=6)?1:0);}
 let loopErr=0;function loop(ts){requestAnimationFrame(loop);try{loopBody(ts);}catch(e){if(loopErr++<5)console.error(e);}}
 function loopBody(ts){tensionCheck();const dt=Math.min(.05,(ts-last)/1000||0);last=ts;shake=Math.max(0,shake-dt);
- if(G&&!paused&&G.started&&!G.over){for(let i=0;i<speed;i++)step(G,dt);uiT-=dt;if(uiT<=0){uiT=.25;ui();}
+ if(ONL&&G&&G.started&&!G.over){step(G,dt);if(G.over&&!ONL.over)G.over=null;uiT-=dt;if(uiT<=0){uiT=.25;ui();}playEv();}
+ else if(G&&!paused&&G.started&&!G.over){for(let i=0;i<speed;i++)step(G,dt);uiT-=dt;if(uiT<=0){uiT=.25;ui();}
   playEv();if(G.over){AU.sfx(G.over);$('ov').style.display='flex';$('ov').innerHTML=`<div class="box"><h1>${G.over==='win'?'Sieg! 🏆':'Niederlage 💀'}</h1><p>${G.over==='win'?'Die KI hat alle Leben verloren.':'Du hast alle Leben verloren.'}</p><button id="again">Neues Spiel</button></div>`;$('again').onclick=start;}}
  if(G)draw();}
+// ===== Online-PvP (server-autoritativ): Eingaben -> Server, Server-Zustand -> hydrate(G) =====
+const LTW_SERVER=new URLSearchParams(location.search).get('server')||window.LTW_SERVER||'https://ltw-server.onrender.com';
+let ONL=null;const localCommand=command;
+command=function(G_,pi,c){if(ONL&&ONL.playing&&pi===0){ONL.send({t:'cmd',seq:++ONL.seq,c});}return localCommand(G_,pi,c);};// lokale Vorhersage, nächster Snapshot korrigiert
+function onlineBtn(){const bx=$('ov').querySelector('.box');if(!bx||$('bOnline'))return;const b=document.createElement('button');b.id='bOnline';b.textContent='🌐 Online (1v1)';b.style.marginTop='8px';b.onclick=onlineMenu;bx.appendChild(b);}
+const ERRN={room_not_found:'Raum nicht gefunden',room_full:'Raum ist voll',rate_limit_kick:'Zu viele Aktionen – getrennt'};
+function onlineMenu(msg){$('ov').style.display='flex';$('ov').innerHTML=`<div class="box"><h3>🌐 Online 1v1</h3><p class="small" id="onSt">${msg||'Server: '+LTW_SERVER}</p>
+ <button id="onQ">⚡ Schnelles Spiel</button><button id="onC">➕ Raum erstellen</button>
+ <div class="rowb"><input id="onCode" maxlength="5" placeholder="CODE" style="flex:1;text-transform:uppercase;font:bold 18px monospace;padding:6px;letter-spacing:3px"><button id="onJ" style="width:auto">Beitreten</button></div>
+ <button id="onB">Zurück</button></div>`;
+ $('onQ').onclick=()=>netGo({t:'queue'},'Suche Gegner… (Server startet ggf. ~30 s)');$('onC').onclick=()=>netGo({t:'create'},'Erstelle Raum…');
+ $('onJ').onclick=()=>{const c=$('onCode').value.trim().toUpperCase();if(c.length===5)netGo({t:'join',code:c},'Trete bei…');};
+ $('onB').onclick=()=>{netClose();start();};}
+function netStatus(t,cancel){$('ov').style.display='flex';$('ov').innerHTML=`<div class="box"><h3>🌐 Online</h3><p id="onSt">${t}</p>${cancel?'<button id="onX">Abbrechen</button>':''}</div>`;if(cancel)$('onX').onclick=()=>{netClose();onlineMenu();};}
+function netClose(){if(ONL){ONL.closing=1;try{ONL.send({t:'leave'});ONL.ws.close();}catch(e){}clearTimeout(ONL.rt);}ONL=null;}
+function netGo(first,txt){netClose();netStatus(txt,1);netConnect(first);}
+function netConnect(first){const url=LTW_SERVER.replace(/^http/,'ws'),ws=new WebSocket(url),o=ONL||{seq:0,tries:0};ONL=o;o.ws=ws;o.first=first;
+ o.send=m=>{if(ws.readyState===1)ws.send(JSON.stringify(m));};
+ ws.onopen=()=>{o.tries=0;ws.send(JSON.stringify({t:'hello',token:o.token,name:localStorage.getItem('ltw_name')||'Spieler'}));};
+ ws.onmessage=e=>{if(ONL!==o)return;netMsg(o,JSON.parse(e.data));};
+ ws.onclose=()=>{if(ONL!==o||o.closing)return;o.playing=false;if(o.inMatch&&!o.over&&o.tries<15){o.tries++;hint('Verbindung verloren – verbinde neu…');o.rt=setTimeout(()=>netConnect(null),1000*Math.min(4,o.tries));}else if(!o.over)onlineMenu('Verbindung getrennt.');};}
+function netMsg(o,m){switch(m.t){
+ case'welcome':o.token=m.token;if(o.first&&!m.resumed)o.send(o.first);o.first=null;if(m.resumed)hint('Wieder verbunden',1500);break;
+ case'queued':netStatus('Suche Gegner…',1);break;
+ case'room':netStatus(`Raum-Code:<br><b style="font:bold 34px monospace;letter-spacing:6px">${m.code}</b><br><span class="small">Code an Freund schicken – warte auf Mitspieler…</span>`,1);break;
+ case'error':if(o.inMatch)hint(ERRN[m.msg]||m.msg,2000);else onlineMenu('⚠ '+(ERRN[m.msg]||m.msg));break;
+ case'match':o.inMatch=1;o.over=0;o.pi=m.you;o.code=m.code;if(!G||!G.online||m.phase==='pick'){G=newGame();G.online=1;for(const p of G.p)p.ai=0;sel=null;selT=null;pending=null;view=0;layout();}
+  if(m.phase==='pick')netPick(o,m);else{G.started=1;o.playing=true;$('ov').style.display='none';}break;
+ case'raceOk':{const b=$('go');if(b){b.disabled=true;b.textContent='Warte auf Gegner…';}break;}
+ case'phase':if(m.phase==='play'){G.started=1;o.playing=true;tab='bau';$('ov').style.display='none';AU.sfx('start');ui();}break;
+ case'state':if(!G)break;NET.hydrate(G,m.s,m.ev);if(selT)selT=G.p[0].towers.find(t=>t.id===selT.id)||null;
+  if(G.p[0].race){document.documentElement.style.setProperty('--rc',RACE[G.p[0].race].c2);document.documentElement.style.setProperty('--rc2',RACE[G.p[0].race].c);}break;
+ case'ack':if(!m.ok&&m.err!=='rate_limited')hint('✖ '+m.err,1200);break;
+ case'oppDisconnected':hint(`Gegner getrennt – Spiel pausiert (max. ${m.left} s)`,m.left*1000);break;
+ case'oppReconnected':hint('Gegner wieder da',1500);break;
+ case'oppLeft':hint('Gegner hat den Raum verlassen',3000);{const b=$('onR');if(b)b.disabled=true;}break;
+ case'rematchReq':{const b=$('onR');if(b)b.textContent='🔁 Revanche annehmen';break;}
+ case'over':{o.over=1;o.playing=false;G.over=m.result;AU.sfx(m.result);const why={lives:'',forfeit_disconnect:' (Gegner nicht zurückgekehrt)',forfeit_left:' (Aufgabe)'}[m.reason]||'';
+  $('ov').style.display='flex';$('ov').innerHTML=`<div class="box"><h1>${m.result==='win'?'Sieg! 🏆':'Niederlage 💀'}</h1><p>${(m.result==='win'?'Gegner hat verloren':'Du hast verloren')+why}</p><button id="onR">🔁 Revanche</button><button id="onM">Online-Menü</button><button id="onE">Hauptmenü</button></div>`;
+  $('onR').onclick=()=>{o.send({t:'rematch'});$('onR').disabled=true;$('onR').textContent='Warte auf Gegner…';};$('onM').onclick=()=>{netClose();onlineMenu();};$('onE').onclick=()=>{netClose();start();};break;}}}
+function netPick(o,m){$('ov').style.display='flex';$('ov').innerHTML='<div class="box"><h3>Gegner: '+String(m.opp).replace(/[<>&]/g,'')+'</h3><h3>Rasse wählen <span id="pkT"></span></h3><div class="rowb" style="flex-wrap:wrap">'+Object.entries(RACE).map(([k,R])=>`<button data-r="${k}" class="${k===race?'sel':''}" style="display:inline-block;width:auto;flex:1 1 30%;border-color:${R.c};background:linear-gradient(${R.c}55,${R.c}22)"><b style="color:${R.c2}">${R.n}</b><br><span class="small">${R.hero.n}</span></button>`).join('')+'</div><p class="small" id="rdesc">'+RACE[race].d+'</p><button id="go">Bereit</button></div>';
+ $('ov').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{race=b.dataset.r;localStorage.setItem('ltw_race',race);$('ov').querySelectorAll('[data-r]').forEach(x=>x.classList.toggle('sel',x===b));$('rdesc').textContent=RACE[race].d;});
+ $('go').onclick=()=>o.send({t:'race',race});const end=Date.now()+m.pickLeft*1000;const iv=setInterval(()=>{const e=$('pkT');if(!e)return clearInterval(iv);e.textContent='('+Math.max(0,Math.ceil((end-Date.now())/1000))+' s)';},250);}
+window.LTW_ONLINE={get state(){return ONL;},menu:onlineMenu};
 start();ui();requestAnimationFrame(loop);}
