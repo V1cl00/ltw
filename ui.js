@@ -58,15 +58,13 @@ const AU={ctx:null,on:localStorage.getItem('ltw_mute')!=='1',last:{},buf:{},act:
    if(i%8===4)this.tone(mf(c[2]+24),.1,'square',.04,0,0,this.musG);step++;},150);}};
 document.addEventListener('pointerdown',()=>AU.init(),{capture:true});for(const ev of['touchend','keydown','click'])document.addEventListener(ev,()=>AU.init(),{capture:true,once:true});
 // ---------- Tutorial ----------
-const TUT=['<b>Willkommen bei Line Tower Wars!</b><br>Gegner-Kreaturen laufen oben los und wollen unten durch. Jede durchgelassene Kreatur kostet dich ein Leben.',
- '<b>🏗 Bauen</b><br>Wähle unten einen Turm und tippe auf ein Feld deiner Bahn (grün = möglich), erneut tippen baut. Mauern sind gratis (max. 40) – reine Wegblocker.',
- '<b>🌀 Labyrinth</b><br>Kreaturen laufen um deine Türme herum. Baue ein langes Labyrinth! Den Weg komplett zu blockieren ist nicht erlaubt.',
- '<b>⚔ Senden</b><br>Schicke Kreaturen zur KI. Das kostet Gold, erhöht aber dauerhaft dein Einkommen (alle 10s). Kommt eine durch, stiehlst du der KI ein Leben ❤! Achte auf Tarnung 👁 und Rüstung 🛡!',
- '<b>✦ Schrein & Element-Turm</b><br>Neben deinem Feld steht der Schrein: aktiviere dort bis zu 2 Elemente gleichzeitig (je 1×, tauschbar). Baue einen Element-Turm, tippe ihn an und stelle ihn gratis auf ein freigeschaltetes Element um, Stufen kaufst du per Aufwerten mit Gold; zwei verschiedene = Spezial-Element (z. B. Feuer+Wasser = Dampf).',
- '<b>⬆ Aufwerten</b><br>Tippe auf einen Turm: 2 Upgrade-Pfade, Zielwahl und Verkaufen. Lange drücken zeigt Infos zu Türmen und Kreaturen.'];
-let tutI=0,tutPaused=false;
-function tut(show){if(show){tutI=0;tutPaused=paused;paused=true;$('tut').style.display='flex';$('tutT').innerHTML=TUT[0];}else{$('tut').style.display='none';paused=tutPaused;localStorage.setItem('ltw_tut','1');}}
-$('tutNext').onclick=()=>{tutI++;if(tutI>=TUT.length)tut(false);else{$('tutT').innerHTML=TUT[tutI];$('tutNext').textContent=tutI===TUT.length-1?'Los geht\'s!':'Weiter ▶';}};
+const TUT=['<b>🛡 Verteidige deine Insel</b><br>Ängste laufen über deine Bahn nach unten. Jede, die durchkommt, kostet ein Leben ❤.',
+ '<b>🏗 Bauen & Labyrinth</b><br>Turm unten wählen, Feld antippen, nochmal tippen = bauen. Baue einen langen Umweg – ganz zumauern geht nicht.',
+ '<b>⚔ Senden</b><br>Schicke Ängste zum Gegner: kostet Gold, erhöht aber dein Einkommen alle 10 s.',
+ '<b>✦ Schrein & Held</b><br>Am Schrein Elemente aktivieren, Türme antippen zum Aufwerten. Doppeltippen bewegt deinen Helden. Viel Erfolg!'];
+let tutI=0,tutPaused=false;const tutN=()=>`<div class="small" style="opacity:.6;margin-top:6px">${tutI+1}/${TUT.length}</div>`;
+function tut(show){if(show){tutI=0;tutPaused=paused;paused=true;$('tut').style.display='flex';$('tutT').innerHTML=TUT[0]+tutN();$('tutNext').textContent='Weiter ▶';}else{$('tut').style.display='none';paused=tutPaused;localStorage.setItem('ltw_tut','1');}}
+$('tutNext').onclick=()=>{tutI++;if(tutI>=TUT.length)tut(false);else{$('tutT').innerHTML=TUT[tutI]+tutN();$('tutNext').textContent=tutI===TUT.length-1?'Los geht\'s!':'Weiter ▶';}};
 $('tutSkip').onclick=()=>tut(false);
 
 let G,sel=null,selT=null,speed=1,paused=false,hover=null,pending=null,last=0,tab='bau',view=0,both=true,CS=28,lanes=[],shake=0;
@@ -179,7 +177,7 @@ $('bPause').onclick=()=>{if(ONL)return;paused=!paused;$('bPause').textContent=pa
 $('bSpeed').onclick=()=>{if(ONL)return;speed=speed===1?2:1;$('bSpeed').textContent=speed+'x';};
 $('bMute').textContent=AU.on?'🔊':'🔇';$('bMute').onclick=()=>{AU.init();let p=$('sndP');if(p){p.remove();return;}p=document.createElement('div');p.id='sndP';
  p.style.cssText='position:fixed;top:54px;right:8px;z-index:40;padding:12px 14px;border-radius:10px;min-width:220px;background:linear-gradient(180deg,rgba(24,46,40,.97),rgba(9,18,15,.98));border:1px solid #e2b55a;box-shadow:inset 0 0 0 3px rgba(9,18,15,.95),inset 0 0 0 4px rgba(226,181,90,.45),0 10px 30px #0009;color:#efe6cc;font:13px system-ui';
- setTimeout(()=>{const q=document.getElementById('sndP');if(q&&!q.querySelector('#pvReplay')){const b=document.createElement('button');b.id='pvReplay';b.textContent='❔ PvP-Einführung zeigen';b.style.marginTop='8px';b.onclick=()=>{q.remove();pvpTut(1);};b.textContent='❔ PvP-Tipps ansehen';q.appendChild(b);}},0);
+ setTimeout(()=>{const q=document.getElementById('sndP');if(q&&!q.querySelector('#pvReplay')){const b=document.createElement('button');b.id='pvReplay';b.textContent='❔ PvP-Einführung zeigen';b.style.marginTop='8px';b.onclick=()=>{q.remove();pvpTut(1);};b.textContent='❔ PvP-Tipps ansehen';q.appendChild(b);const c=document.createElement('button');c.textContent='📖 Tutorial erneut';c.style.marginTop='6px';c.onclick=()=>{q.remove();if(!ONL||ONL.local)tut(true);else pvpTut(1);};q.appendChild(c);}},0);
  const row=(k,l)=>`<label style="display:flex;align-items:center;gap:8px;margin:8px 0">${l}<input type="range" min="0" max="1" step=".05" value="${AU.vol[k]}" data-k="${k}" style="flex:1;accent-color:#e2b55a;height:28px"></label>`;
  p.innerHTML=`<b style="font-family:var(--serif);color:#fff0b8;letter-spacing:1px">Klang</b>${row('m','Gesamt')}${row('mu','Musik')}${row('s','Effekte')}<button id="sndM" style="width:100%;min-height:40px">${AU.on?'🔇 Stumm schalten':'🔊 Ton an'}</button>`;
  document.body.appendChild(p);p.querySelectorAll('input').forEach(i=>i.oninput=()=>AU.setVol(i.dataset.k,+i.value));
