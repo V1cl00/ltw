@@ -18,7 +18,7 @@ const AU={ctx:null,on:localStorage.getItem('ltw_mute')!=='1',last:{},buf:{},act:
  noise(d,v=.3,ff=1200){const c=this.ctx,t=c.currentTime,b=c.createBuffer(1,c.sampleRate*d,c.sampleRate),a=b.getChannelData(0);for(let i=0;i<a.length;i++)a[i]=(Math.random()*2-1)*(1-i/a.length);
   const s=c.createBufferSource(),fl=c.createBiquadFilter(),g=c.createGain();fl.type='lowpass';fl.frequency.value=ff;g.gain.value=v;s.buffer=b;s.connect(fl);fl.connect(g);g.connect(this.sfxG);s.start(t);},
  // ---- Echte Audiodateien (audio/manifest.json), Synth nur als Fallback ----
-  async load(){let man=null,nm=null;try{man=await (await fetch('audio/manifest.json')).json();}catch(e){}try{nm=await (await fetch('assets/audio/audio.json?v=16')).json();}catch(e){}
+  async load(){let man=null,nm=null;try{man=await (await fetch('audio/manifest.json')).json();}catch(e){}try{nm=await (await fetch('assets/audio/audio.json?v=17')).json();}catch(e){}
   const dec=async(k,url)=>{try{const ab=await (await fetch(url)).arrayBuffer();this.buf[k]=await new Promise((ok,no)=>this.ctx.decodeAudioData(ab,ok,no));}catch(e){}};
   const ogg=!!document.createElement('audio').canPlayType('audio/ogg; codecs="vorbis"');
   if(nm&&nm.events){this.ev=nm.events;await Promise.all(Object.entries(nm.events).map(([k,v])=>{const s=v.src.find(u=>ogg?/\.ogg$/.test(u):/\.mp3$/.test(u))||v.src[v.src.length-1];return dec(k,s);}));}
