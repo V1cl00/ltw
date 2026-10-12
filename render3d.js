@@ -3,7 +3,7 @@
 // Kamera: Perspektive schräg (BTD6-artig), horizontales Wischen fliegt frei über beide Bahnen (Trägheit + Einrasten).
 import * as THREE from 'three';
 import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
-import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';import {ShaderPass} from 'three/addons/postprocessing/ShaderPass.js';import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';import {ShaderPass} from 'three/addons/postprocessing/ShaderPass.js';import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 // ---------- Qualitätsstufen: Ultra (PC, automatisch) / Leicht (Handy); Auto-Absenkung bei < 38 fps ----------
 const DESK=!matchMedia('(pointer:coarse)').matches&&innerWidth>=900;
 const QP={ultra:{n:'Ultra',pr:Math.min(devicePixelRatio||1,2),sh:4096,bloom:1,parts:1500,amb:320,detail:1,outline:1},
@@ -12,7 +12,7 @@ let Q=localStorage.getItem('ltw_q');if(!QP[Q])Q=DESK?'ultra':'low';let QC=QP[Q];
 const COLS=11,ROWS=20,LGAP=21;
 const cv=document.getElementById('cv');
 const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'});
-renderer.setPixelRatio(QC.pr);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
+renderer.setPixelRatio(QC.pr);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;
 const scene=new THREE.Scene();const SKY=new THREE.Color(0xe6d3b8);scene.background=SKY.clone();scene.fog=new THREE.FogExp2(0xe6d3b8,.0105);
 const cam=new THREE.PerspectiveCamera(42,1,.1,300);
 const composer=new EffectComposer(renderer);composer.setPixelRatio(QC.pr);composer.addPass(new RenderPass(scene,cam));
@@ -21,8 +21,8 @@ const grade=new ShaderPass({uniforms:{tDiffuse:{value:null},vig:{value:.42}},ver
  fragmentShader:'uniform sampler2D tDiffuse;uniform float vig;varying vec2 vUv;void main(){vec4 c=texture2D(tDiffuse,vUv);vec2 d=vUv-.5;float l=dot(c.rgb,vec3(.299,.587,.114));c.rgb=mix(vec3(l),c.rgb,1.08);c.rgb=mix(c.rgb*vec3(.92,.9,1.08),c.rgb*vec3(1.06,1.,.92),smoothstep(.2,.8,l));c.rgb*=1.-vig*dot(d,d)*2.;gl_FragColor=c;}'});composer.addPass(grade);
 const tilt=new ShaderPass({uniforms:{tDiffuse:{value:null},px:{value:new THREE.Vector2(1/1920,1/1080)},amt:{value:1.3}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
  fragmentShader:'uniform sampler2D tDiffuse;uniform vec2 px;uniform float amt;varying vec2 vUv;void main(){float k=smoothstep(.22,.5,abs(vUv.y-.45))*amt;vec4 c=vec4(0.);float w=0.;for(int i=-3;i<=3;i++)for(int j=-3;j<=3;j++){vec2 o=vec2(float(i),float(j))*px*k;float g=exp(-float(i*i+j*j)/8.);c+=texture2D(tDiffuse,vUv+o)*g;w+=g;}gl_FragColor=c/w;}'});tilt.enabled=!!QC.detail;composer.addPass(tilt);
-scene.add(new THREE.HemisphereLight(0x9db4ff,0x5a6a3a,.95));{const f=new THREE.DirectionalLight(0x9db4ff,.45);f.position.set(30,14,40);scene.add(f);}
-const sun=new THREE.DirectionalLight(0xffd9a0,2.5);sun.castShadow=true;sun.shadow.mapSize.set(QC.sh,QC.sh);sun.shadow.bias=-.0004;sun.shadow.normalBias=.02;
+scene.add(new THREE.HemisphereLight(0xb8c8ff,0x6a7a4a,1.25));{const f=new THREE.DirectionalLight(0x9db4ff,.45);f.position.set(30,14,40);scene.add(f);}
+const sun=new THREE.DirectionalLight(0xffd9a0,2.9);sun.castShadow=true;sun.shadow.mapSize.set(QC.sh,QC.sh);sun.shadow.bias=-.0004;sun.shadow.normalBias=.02;
 Object.assign(sun.shadow.camera,{left:-17,right:17,top:17,bottom:-17,near:1,far:70});sun.shadow.radius=4;scene.add(sun,sun.target);
 function ctex(w,h,draw,rep){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;if(rep)t.repeat.set(rep[0],rep[1]);t.anisotropy=4;return t;}
 const rnd=Math.random,hsl=(h,s,l,a=1)=>`hsla(${h},${s}%,${l}%,${a})`;
@@ -350,8 +350,8 @@ const R3D={onLane:null,lockPan:false,
 {const b=document.getElementById('bQ');if(b){b.textContent=QC.n;b.title='Grafikqualität (Ultra/Leicht)';b.onclick=()=>R3D.setQuality(Q==='ultra'?'low':'ultra');}}
 // ---------- Meshy-GLB-Hook: assets/meshy/manifest.json {"m_bogen":"turm_laterne.glb", ...}; geladene Modelle ersetzen Platzhalter ----------
 const MESHY={};R3D.meshy=MESHY;
-fetch('assets/meshy/manifest.json').then(r=>r.ok?r.json():null).then(mf=>{if(!mf)return;const ld=new GLTFLoader();for(const[k,f]of Object.entries(mf)){if(k.startsWith('_'))continue;const e=typeof f==='string'?{file:f}:f;
- ld.load('assets/meshy/'+e.file,gl=>{const o=gl.scene;o.traverse(m=>{if(m.isMesh){m.castShadow=m.receiveShadow=true;if(e.color)m.material=new THREE.MeshStandardMaterial({color:e.color,roughness:.75,metalness:.15});}});const b=new THREE.Box3().setFromObject(o),sz=b.getSize(new THREE.Vector3());const sc=(e.height||1.6)/Math.max(.001,sz.y);o.scale.setScalar(sc);o.position.y=-b.min.y*sc;{const c=b.getCenter(new THREE.Vector3());o.position.x=-c.x*sc;o.position.z=-c.z*sc;}if(e.rotY)o.rotation.y=e.rotY;MESHY[k]=o;
+fetch('assets/meshy/manifest.json').then(r=>r.ok?r.json():null).then(mf=>{if(!mf)return;const ld=new GLTFLoader();let _env=null;const ENVT=()=>_env||(_env=new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(),.04).texture);for(const[k,f]of Object.entries(mf)){if(k.startsWith('_'))continue;const e=typeof f==='string'?{file:f}:f;
+ ld.load('assets/meshy/'+e.file,gl=>{const o=gl.scene;o.traverse(m=>{if(m.isMesh){m.castShadow=m.receiveShadow=true;{const mm=m.material;if(mm&&mm.isMeshStandardMaterial){if(mm.map){mm.map.colorSpace=THREE.SRGBColorSpace;mm.emissiveMap=mm.map;mm.emissive=new THREE.Color(0xffffff);mm.emissiveIntensity=.15;}mm.envMap=ENVT();mm.envMapIntensity=.9;mm.needsUpdate=true;}}if(e.color)m.material=new THREE.MeshStandardMaterial({color:e.color,roughness:.75,metalness:.15});}});const b=new THREE.Box3().setFromObject(o),sz=b.getSize(new THREE.Vector3());const sc=(e.height||1.6)/Math.max(.001,sz.y);o.scale.setScalar(sc);o.position.y=-b.min.y*sc;{const c=b.getCenter(new THREE.Vector3());o.position.x=-c.x*sc;o.position.z=-c.z*sc;}if(e.rotY)o.rotation.y=e.rotY;MESHY[k]=o;
   for(const L of lanes)for(const t of L.towers.values())t.userData.key='';if(k==='schrein'||k==='goldmine')for(const L of lanes){const G=k==='schrein'?L.shr:L.mine;if(G.userData.meshy)continue;G.userData.meshy=1;for(const c of G.children)if(c.isMesh&&c!==L.shit&&c!==L.mhit)c.visible=false;const m=o.clone();if(e.pos)m.position.add(new THREE.Vector3(...e.pos));G.add(m);}},undefined,err=>console.warn('Meshy-Modell fehlt',e.file,err));}}).catch(()=>{});
 window.R3D=R3D;
-const s=document.createElement('script');s.src='ui.js?v=6';document.body.appendChild(s);
+const s=document.createElement('script');s.src='ui.js?v=7';document.body.appendChild(s);
