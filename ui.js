@@ -1,7 +1,7 @@
 // ================= UI =================
 if(typeof document!=='undefined'){
 // Renderer-Plugin: window.R3D (3d.html) ersetzt den 2D-Canvas-Renderer
-const R3=window.R3D||null;window.__ltwTowers=()=>G.p[0].towers.length;window.__ltwG=()=>G;window.__cellXY=(x,y)=>{if(R3)return R3.cellScreen(x,y);const L=lanes[0],r=cv.getBoundingClientRect();return[r.left+(L.ox+(x+.5)*CS)*(r.width/Wc),r.top+(L.oy+(y+.5)*CS)*(r.height/Hc)];};// Test-Hook (nur lesend)
+const R3=window.R3D||null;window.__ltwTowers=()=>G.p[0].towers.length;window.__ltwG=()=>G;window.__ltwUI=()=>({tab,sel,lastHT});window.__cellXY=(x,y)=>{if(R3)return R3.cellScreen(x,y);const L=lanes[0],r=cv.getBoundingClientRect();return[r.left+(L.ox+(x+.5)*CS)*(r.width/Wc),r.top+(L.oy+(y+.5)*CS)*(r.height/Hc)];};// Test-Hook (nur lesend)
 const cv=document.getElementById('cv'),cx=R3?null:cv.getContext('2d'),$=id=>document.getElementById(id);
 // ---------- Audio (WebAudio-Synthese) ----------
 const AU={ctx:null,on:localStorage.getItem('ltw_mute')!=='1',last:{},buf:{},act:0,tension:0,
@@ -93,7 +93,7 @@ function schreinPanel(p){const na=activeEls(p).length;return `<div class="small"
 function mDesc(k,l){const s=mStats(k,l);if(k==='blitzmeister')return `${s.targets} Ziele, ${s.dmg} Schaden, alle ${s.rate.toFixed(1)}s${s.camo?', sieht Tarnung':''}`;
  if(k==='frostmeister')return `Puls alle ${s.rate.toFixed(1)}s: −${Math.round(s.slow*100)}% Tempo für ${s.dur}s, ${s.dmg} Schaden`;return `+${s.inc} Einkommen/Tick, +${Math.round(s.kill*100)}% Killgold`;}
 let lastP='',lastS='';
-function ui(){if(!G)return;const p=G.p[0],o=G.p[1];
+function ui(){if(!G)return;const p=G.p[0],o=G.p[1];pvpBar();
  const mine=p.creeps.length,deep=p.creeps.some(c=>c.y>ROWS*.6),theirs=o.creeps.length;
  $('stat').innerHTML=`<span id="hG">💰<b class="cG">${Math.floor(p.gold)}</b></span><span id="hI">📈<b class="cI">+${p.income}</b><span class="incT"><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="#fff3" stroke-width="2.5"/><circle cx="8" cy="8" r="6" fill="none" stroke="#FFC93C" stroke-width="2.5" stroke-dasharray="37.7" stroke-dashoffset="${(37.7*Math.max(0,Math.min(1,G.tick/(G.tickLen||10)))).toFixed(1)}" transform="rotate(-90 8 8)"/></svg> in ${Math.max(0,Math.ceil(G.tick))}s</span></span><span>❤<b class="cL">${p.lives}</b></span><span>${ONL?"⚔":"KI"}❤<b style="color:#e99">${o.lives}</b></span><span class="${deep?'alarm':''}" title="Gegner auf deiner Bahn">⚔<b>${mine}</b></span><span title="Deine Kreaturen bei der KI">➜<b>${theirs}</b></span><span>⛏<b class="cG">${p.mine.w}</b></span>${G.evt&&G.et<G.evt.end?`<span style="color:#c9f">${EVT[G.evt.k].ico}${Math.ceil(G.evt.end-G.et)}s</span>`:''}`;
  if(pumpG){const e=document.querySelector('#hG');e&&e.classList.add('pump');pumpG=0;}if(glowI){const e=document.querySelector('#hI');e&&e.classList.add('glow');glowI=0;}
@@ -113,7 +113,7 @@ function ui(){if(!G)return;const p=G.p[0],o=G.p[1];
    <div class="rowb"><button data-act="sell">Verkaufen +${Math.floor(selT.spent*.75)}💰</button></div>`;}}
  else if(tab==='bau'){h=Object.entries(TT).filter(([k,t])=>t.wall||k==='element'||!p.race&&!t.race||t.race===p.race).map(([k,t])=>`<button data-act="bsel" data-t="${k}" class="${sel===k?'sel':''}" ${p.gold<t.cost||(t.max&&typeCount(p,k)>=t.max)?'disabled':''}><span class="ico" style="color:${t.race?RACE[t.race].c2:t.c}">${t.ico}</span>${t.n}<span class="small">${t.role?'<i>'+t.role+'</i> ':''}${t.max&&!t.cost?'gratis '+wallCount(p)+'/'+t.max:t.cost+'💰'+(t.max?' '+typeCount(p,k)+'/'+t.max:'')}</span></button>`).join('');
   if(p.master&&!p.masterT)h=`<button data-act="bsel" data-t="master" class="${sel==='master'?'sel':''}"><span class="ico" style="color:${MT[p.master].c}">★</span>Meister<span class="small">gratis</span></button>`+h;}
- else if(tab==='send')h=CT.filter(c=>ctAvail(p,c)).map(c=>{const lk=G.t<c.unlock,cd=sendCd(G,p,c);return `<button data-act="send" data-c="${c.id}" title="${c.n}: Kosten ${creepCost(G,c)}💰, dein Einkommen +${incGain(p,c)}, Gegner erhält Kopfgeld = Einkommensgewinn${c.d?' · '+c.d:''}" ${lk||cd>0||p.gold<creepCost(G,c)?'disabled':''}><span class="ico" style="color:${c.c}">${c.thief?'💰':c.sabo?'⚙':c.raceUnit?'★':c.fly?'▼':c.camo?'◌':c.armor?'⬢':'●'}</span>${c.n}<span class="small">${lk?'🔒 '+(c.unlock-Math.floor(G.t))+'s':cd>0?'⏳ '+Math.ceil(cd)+'s':(creepCost(G,c)<c.cost?'<s>'+c.cost+'</s> '+creepCost(G,c):'<b style="color:#FFC93C;font-size:1.15em">'+c.cost+'💰</b>')+' +'+incGain(p,c)+'📈'}</span></button>`}).join('');
+ else if(tab==='send')h=(G.others?`<div class="small" style="align-self:center;display:flex;gap:4px;flex-wrap:wrap;max-width:260px">Ziel: <button data-act="sto" data-i="-1" style="width:auto;${p.sendTo==null?'outline:2px solid #FFC93C':''}">Auto</button>${G.others.filter(q=>q.i!==G.me&&!q.dead).map(q=>`<button data-act="sto" data-i="${q.i}" style="width:auto;${p.sendTo===q.i?'outline:2px solid #FFC93C':''}">${esc(q.name)}${q.i===G.tgt?' 🎯':''}</button>`).join('')}</div>`:'')+CT.filter(c=>ctAvail(p,c)).map(c=>{const lk=G.t<c.unlock,cd=sendCd(G,p,c);return `<button data-act="send" data-c="${c.id}" title="${c.n}: Kosten ${creepCost(G,c)}💰, dein Einkommen +${incGain(p,c)}, Gegner erhält Kopfgeld = Einkommensgewinn${c.d?' · '+c.d:''}" ${lk||cd>0||p.gold<creepCost(G,c)?'disabled':''}><span class="ico" style="color:${c.c}">${c.thief?'💰':c.sabo?'⚙':c.raceUnit?'★':c.fly?'▼':c.camo?'◌':c.armor?'⬢':'●'}</span>${c.n}<span class="small">${lk?'🔒 '+(c.unlock-Math.floor(G.t))+'s':cd>0?'⏳ '+Math.ceil(cd)+'s':(creepCost(G,c)<c.cost?'<s>'+c.cost+'</s> '+creepCost(G,c):'<b style="color:#FFC93C;font-size:1.15em">'+c.cost+'💰</b>')+' +'+incGain(p,c)+'📈'}</span></button>`}).join('');
  else if(tab==='mine'){const M=p.mine,L=MINE[M.lvl],nx=MINE[M.lvl+1];
   h=`<div class="small" style="min-width:120px;align-self:center">⛏ ${M.w} Arbeiter liefern automatisch<br>≈${(L.y*M.w).toFixed(1)}💰/s</div>`+
    `<button data-act="worker" ${M.w>=L.cap||p.gold<workerCost(p)?'disabled':''}><span class="ico">👷</span>Arbeiter ${M.w}/${L.cap}<span class="small">${M.w>=L.cap?'voll':workerCost(p)+'💰 · +'+L.y+'/s'}</span></button>`+
@@ -127,6 +127,7 @@ function ui(){if(!G)return;const p=G.p[0],o=G.p[1];
  if(h!==lastP){$('panel').innerHTML=h;lastP=h;}if(sh!==lastS){$('sheet').innerHTML=sh;lastS=sh;}
  $('panel').style.visibility=sh?'hidden':'visible';$('sheet').style.display=sh?'flex':'none';}
 function act(e){const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const p=G.p[0],a=b.dataset.act;
+ if(a==='sto'){const i=+b.dataset.i;command(G,0,{op:'sendTo',to:i<0?null:i});p.sendTo=i<0?null:i;if(ONL)ONL.send({t:'watch',pi:i<0?null:i});ui();return;}
  if(a==='bsel'){sel=sel===b.dataset.t?null:b.dataset.t;pending=null;hint('');if(sel&&!both&&view)view=0,layout();}
  else if(a==='send'){const ig=command(G,0,{op:'send',creep:b.dataset.c});if(ig){AU.sfx('send');pop('+'+ig+' Einkommen 📈','#fd5');}}
  
@@ -160,6 +161,14 @@ cv.addEventListener('contextmenu',e=>{e.preventDefault();sel=null;selT=null;pend
 addEventListener('keydown',e=>{if(e.key==='Escape'){line=null;dragB=null;sel=null;selT=null;pending=null;hint('');ui();}if(e.key===' '){e.preventDefault();$('bPause').click();}});
 let lpT=null,lpDone=false,lpXY=null;
 function posAt(e){if(R3){const h=R3.pick(e.clientX,e.clientY);return h&&h.fx!=null?{pi:h.pi,fx:h.fx,fy:h.fy}:null;}const[px,py]=cpt(e);for(let i=0;i<2;i++){const L=lanes[i];if(!L)continue;const fx=(px-L.ox)/CS,fy=(py-L.oy)/CS;if(fx>=0&&fy>=0&&fx<COLS&&fy<ROWS)return{pi:i,fx,fy};}return null;}
+let lastHT=null;const esc=s=>String(s).replace(/[<>&"]/g,'');
+function goLane(i){if(R3&&R3.goLane)R3.goLane(i);else{view=i;layout();}}
+function pvpBar(){let b=$('pvpBar');if(!G||!G.online||!G.others){if(b)b.remove();return;}
+ if(!b){b=document.createElement('div');b.id='pvpBar';b.style.cssText='position:fixed;top:44px;left:50%;transform:translateX(-50%);z-index:30;display:flex;gap:4px;font-size:11px;pointer-events:auto';document.body.appendChild(b);
+  b.onclick=e=>{const t=e.target.closest('[data-w]');if(!t)return;const i=+t.dataset.w;if(i===G.me){goLane(0);}else{ONL&&ONL.send({t:'watch',pi:i});goLane(1);}AU.sfx('tap');};}
+ const h=G.others.map(q=>`<button data-w="${q.i}" style="width:auto;padding:2px 8px;border-radius:999px;background:rgba(0,0,0,${q.i===G.watch&&q.i!==G.me?'.65':'.35'});border:1px solid ${q.i===G.me?'#FFC93C':q.i===G.watch?'#7CF7FF':'#fff3'};color:#fff;opacity:${q.dead?.5:1}">${q.i===G.me?'🏠 Ich':esc(q.name)} ${q.dead?'💀 #'+q.place:'❤'+q.lives}${q.i===G.tgt&&q.i!==G.me?' 🎯':''}</button>`).join('');
+ if(b._h!==h){b.innerHTML=h;b._h=h;}}
+function heroMark(x,y){for(let j=0;j<14;j++){const a=j/14*6.283;G.fx.push({k:'part',pi:0,x:x+.5+Math.cos(a)*.42,y:y+.5+Math.sin(a)*.42,vx:0,vy:0,t:1.1,c:j%2?'#7CF7FF':'#FFF6E0'});}G.fx.push({k:'part',pi:0,x:x+.5,y:y+.5,vx:0,vy:0,t:1.1,c:'#7CF7FF'});}
 function infoAt(e){const q=posAt(e);if(!q)return null;const p=G.p[q.pi];let best=null,bd=.8;for(const c of p.creeps){const d=Math.hypot(c.x-q.fx,c.y-q.fy);if(d<bd){bd=d;best=c;}}
  if(best){const c=best,ct=c.ct;return `<b style="color:${ct.c}">${ct.n}</b><br>LP ${Math.ceil(c.hp)}/${Math.ceil(c.max)} · Tempo ${ct.sp}<br>${c.fly?'✈ Fliegt (ignoriert Labyrinth)<br>':''}${c.camo?'👁 Getarnt – nur Türme mit Tarnungserkennung<br>':''}${c.armor?'🛡 Gepanzert – −60% phys., −30% magisch<br>':''}${ct.heal?'✚ Heilt Nachbarn<br>':''}Kopfgeld ${c.bounty}💰 (= Einkommen des Senders)`;}
  const H=p.hero;if(H&&Math.hypot(q.fx-H.x,q.fy-H.y)<.75){const S=heroStats(H);return `<b style="color:${H.c}">🦸 ${H.n}</b> Stufe ${H.lvl}/10<br>Schaden ${S.dmg} · RW ${S.rng.toFixed(1)}<br>${H.ab.map(k=>ABIL[k].ico+' '+ABIL[k].n+': '+ABIL[k].d).join('<br>')}<br><span class="small">Antippen → Held-Menü, Bewegen</span>`;}
@@ -193,7 +202,10 @@ cv.addEventListener('pointerup',e=>{clearTimeout(lpT);lpXY=null;if(R3)R3.lockPan
  if(line&&!dragB){const c=cellAt(e);if(c&&c.pi===0&&line.cells.some(q=>q.x===c.x&&q.y===c.y))buildLine();else{line=null;hint('');}return;}
  if(dragB){clearTimeout(dragB.holdT);const d=dragB;if(d.active&&d.moved&&d.cells.length>1){updLine();if(!d.touch){buildLine();return;}dragB=null;return;}dragB=null;line=null;}if(lpDone){lpDone=false;$('tip').style.display='none';return;}if(!G||G.over)return;
  if(heroMv){const c=cellAt(e);if(c&&c.pi===0){command(G,0,{op:'heroMove',x:c.x,y:c.y});AU.sfx('tap');}heroMv=0;ui();return;}
- {const q=posAt(e),H=G.p[0].hero;if(q&&q.pi===0&&H&&Math.hypot(q.fx-H.x,q.fy-H.y)<.75&&!sel){tab='held';selT=null;AU.sfx('tap');ui();return;}}if(schreinHit(e)){tab='meister';sel=null;selT=null;AU.sfx('tap');ui();return;}if(mineHit(e)){if(true){tab='mine';sel=null;selT=null;ui();}else{tab='mine';selT=null;}localStorage.setItem('ltw_minehint','1');ui();return;}const c=cellAt(e),p=G.p[0];if(!c||c.pi!==0){selT=null;pending=null;ui();return;}
+ {const q=posAt(e),H=G.p[0].hero;if(q&&q.pi===0&&H&&Math.hypot(q.fx-H.x,q.fy-H.y)<.75&&!sel){tab='held';selT=null;AU.sfx('tap');ui();return;}}
+ if(tab==='held'&&!sel&&G.p[0].hero){const c=cellAt(e);if(c&&c.pi===0&&!G.p[0].grid[c.y][c.x]){const now=performance.now(),L=lastHT;
+   if(L&&now-L.t<450&&Math.abs(L.x-c.x)<=1&&Math.abs(L.y-c.y)<=1){lastHT=null;if(command(G,0,{op:'heroMove',x:c.x,y:c.y})){heroMark(c.x,c.y);AU.sfx('tap');}}
+   else{lastHT={t:now,x:c.x,y:c.y};if(!localStorage.getItem('ltw_hmh')){localStorage.setItem('ltw_hmh','1');hint('Doppeltippen/-klicken: Held läuft dorthin',1800);}}return;}}if(schreinHit(e)){tab='meister';sel=null;selT=null;AU.sfx('tap');ui();return;}if(mineHit(e)){if(true){tab='mine';sel=null;selT=null;ui();}else{tab='mine';selT=null;}localStorage.setItem('ltw_minehint','1');ui();return;}const c=cellAt(e),p=G.p[0];if(!c||c.pi!==0){selT=null;pending=null;ui();return;}
  const t=p.grid[c.y][c.x];if(t){selT=t;sel=null;pending=null;hint('');ui();return;}
  if(!sel){selT=null;ui();return;}
  const touch=e.pointerType!=='mouse';
@@ -393,7 +405,7 @@ let loopErr=0;function loop(ts){requestAnimationFrame(loop);try{loopBody(ts);}ca
 function loopBody(ts){tensionCheck();const dt=Math.min(.05,(ts-last)/1000||0);last=ts;shake=Math.max(0,shake-dt);
  if(ONL&&G&&G.started&&!G.over){step(G,dt);if(G.over&&!ONL.over)G.over=null;uiT-=dt;if(uiT<=0){uiT=.25;ui();}playEv();}
  else if(G&&!paused&&G.started&&!G.over){for(let i=0;i<speed;i++)step(G,dt);uiT-=dt;if(uiT<=0){uiT=.25;ui();}
-  playEv();if(G.over){AU.sfx(G.over);$('ov').style.display='flex';$('ov').innerHTML=`<div class="box"><h1>${G.over==='win'?'Sieg! 🏆':'Niederlage 💀'}</h1><p>${G.over==='win'?'Die KI hat alle Leben verloren.':'Du hast alle Leben verloren.'}</p><button id="again">Neues Spiel</button></div>`;$('again').onclick=start;}}
+  playEv();if(G.over&&!G.online){AU.sfx(G.over);$('ov').style.display='flex';$('ov').innerHTML=`<div class="box"><h1>${G.over==='win'?'Sieg! 🏆':'Niederlage 💀'}</h1><p>${G.over==='win'?'Die KI hat alle Leben verloren.':'Du hast alle Leben verloren.'}</p><button id="again">Neues Spiel</button></div>`;$('again').onclick=start;}}
  if(G)draw();}
 // ===== Online-PvP (server-autoritativ): Eingaben -> Server, Server-Zustand -> hydrate(G) =====
 const LTW_SERVER=new URLSearchParams(location.search).get('server')||window.LTW_SERVER||'https://ltw-server.onrender.com';
@@ -401,13 +413,16 @@ let ONL=null;const localCommand=command;
 command=function(G_,pi,c){if(ONL&&ONL.playing&&pi===0){ONL.send({t:'cmd',seq:++ONL.seq,c});}return localCommand(G_,pi,c);};// lokale Vorhersage, nächster Snapshot korrigiert
 function onlineBtn(){const bx=$('ov').querySelector('.box');if(!bx||$('bOnline'))return;const b=document.createElement('button');b.id='bOnline';b.textContent='🌐 Online (1v1)';b.style.marginTop='8px';b.onclick=onlineMenu;bx.appendChild(b);}
 const ERRN={room_not_found:'Raum nicht gefunden',room_full:'Raum ist voll',rate_limit_kick:'Zu viele Aktionen – getrennt'};
-function onlineMenu(msg){$('ov').style.display='flex';$('ov').innerHTML=`<div class="box"><h3>🌐 Online 1v1</h3><p class="small" id="onSt">${msg||'Server: '+LTW_SERVER}</p>
+function onlineMenu(msg){$('ov').style.display='flex';$('ov').innerHTML=`<div class="box"><h3>🌐 Online PvP</h3><p class="small" id="onSt">${msg||'Server: '+LTW_SERVER}</p>
+ <div class="rowb" id="onN" style="gap:6px">Spieler: ${[2,3,4].map(n=>`<button data-n="${n}" class="${n===netSize()?'sel':''}" style="width:auto;flex:1">${n}</button>`).join('')}</div>
  <button id="onQ">⚡ Schnelles Spiel</button><button id="onC">➕ Raum erstellen</button>
  <div class="rowb"><input id="onCode" maxlength="5" placeholder="CODE" style="flex:1;text-transform:uppercase;font:bold 18px monospace;padding:6px;letter-spacing:3px"><button id="onJ" style="width:auto">Beitreten</button></div>
  <button id="onB">◀ Zurück</button></div>`;
- $('onQ').onclick=()=>netGo({t:'queue'},'Suche Gegner… (Server startet ggf. ~30 s)');$('onC').onclick=()=>netGo({t:'create'},'Erstelle Raum…');
+ $('onN').querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{localStorage.setItem('ltw_pvpn',b.dataset.n);$('onN').querySelectorAll('[data-n]').forEach(x=>x.classList.toggle('sel',x===b));});
+ $('onQ').onclick=()=>netGo({t:'queue',size:netSize()},'Suche Gegner… (Server startet ggf. ~30 s)');$('onC').onclick=()=>netGo({t:'create',size:netSize()},'Erstelle Raum…');
  $('onJ').onclick=()=>{const c=$('onCode').value.trim().toUpperCase();if(c.length===5)netGo({t:'join',code:c},'Trete bei…');};
  $('onB').onclick=()=>{netClose();titleScreen();};}
+const netSize=()=>[2,3,4].includes(+localStorage.getItem('ltw_pvpn'))?+localStorage.getItem('ltw_pvpn'):2;
 function netStatus(t,cancel){$('ov').style.display='flex';$('ov').innerHTML=`<div class="box"><h3>🌐 Online</h3><p id="onSt">${t}</p>${cancel?'<button id="onX">Abbrechen</button>':''}</div>`;if(cancel)$('onX').onclick=()=>{netClose();onlineMenu();};}
 function netClose(){if(ONL){ONL.closing=1;try{ONL.send({t:'leave'});ONL.ws.close();}catch(e){}clearTimeout(ONL.rt);}ONL=null;}
 function netGo(first,txt){netClose();netStatus(txt,1);netConnect(first);}
@@ -418,8 +433,10 @@ function netConnect(first){const url=LTW_SERVER.replace(/^http/,'ws'),ws=new Web
  ws.onclose=()=>{if(ONL!==o||o.closing)return;o.playing=false;if(o.inMatch&&!o.over&&o.tries<15){o.tries++;hint('Verbindung verloren – verbinde neu…');o.rt=setTimeout(()=>netConnect(null),1000*Math.min(4,o.tries));}else if(!o.over)onlineMenu('Verbindung getrennt.');};}
 function netMsg(o,m){switch(m.t){
  case'welcome':o.token=m.token;if(o.first&&!m.resumed)o.send(o.first);o.first=null;if(m.resumed)hint('Wieder verbunden',1500);break;
- case'queued':netStatus('Suche Gegner…',1);break;
- case'room':netStatus(`Raum-Code:<br><b style="font:bold 34px monospace;letter-spacing:6px">${m.code}</b><br><span class="small">Code an Freund schicken – warte auf Mitspieler…</span>`,1);break;
+ case'queued':netStatus(`Suche Gegner… ${m.size?`(${m.have||1}/${m.size} Spieler)`:''}`,1);break;
+ case'room':o.room=m;case'lobby':{const L=m.t==='lobby'?m:{code:m.code,size:m.size||2,have:1,names:[]};netStatus(`Raum-Code (${L.size} Spieler):<br><b style="font:bold 34px monospace;letter-spacing:6px">${L.code}</b><br><span class="small">Code an Freunde schicken – ${L.have}/${L.size} da${L.names.length?': '+L.names.filter(n=>n!=='—').map(esc).join(', '):''}. Start, sobald voll.</span>`,1);break;}
+ case'eliminated':hint(`💀 Ausgeschieden – Platz ${m.place}. Du kannst weiter zuschauen.`,4000);break;
+ case'playerOut':if(m.pi!==o.pi)pop(`💀 ${esc(m.name||'Spieler')} ist raus (Platz ${m.place})`,'#f99');break;
  case'error':if(o.inMatch)hint(ERRN[m.msg]||m.msg,2000);else onlineMenu('⚠ '+(ERRN[m.msg]||m.msg));break;
  case'match':o.inMatch=1;o.over=0;o.pi=m.you;o.code=m.code;if(!G||!G.online||m.phase==='pick'){G=newGame();G.online=1;for(const p of G.p)p.ai=0;sel=null;selT=null;pending=null;view=0;layout();}
   if(m.phase==='pick')netPick(o,m);else{G.started=1;o.playing=true;$('ov').style.display='none';}break;
@@ -431,9 +448,9 @@ function netMsg(o,m){switch(m.t){
  case'oppDisconnected':hint(`Gegner getrennt – Spiel pausiert (max. ${m.left} s)`,m.left*1000);break;
  case'oppReconnected':hint('Gegner wieder da',1500);break;
  case'oppLeft':hint('Gegner hat den Raum verlassen',3000);{const b=$('onR');if(b)b.disabled=true;}break;
- case'rematchReq':{const b=$('onR');if(b)b.textContent='🔁 Revanche annehmen';break;}
- case'over':{o.over=1;o.playing=false;G.over=m.result;AU.sfx(m.result);const why={lives:'',forfeit_disconnect:' (Gegner nicht zurückgekehrt)',forfeit_left:' (Aufgabe)'}[m.reason]||'';
-  $('ov').style.display='flex';$('ov').innerHTML=`<div class="box"><h1>${m.result==='win'?'Sieg! 🏆':'Niederlage 💀'}</h1><p>${(m.result==='win'?'Gegner hat verloren':'Du hast verloren')+why}</p><button id="onR">🔁 Revanche</button><button id="onM">Online-Menü</button><button id="onE">Hauptmenü</button></div>`;
+ case'rematchReq':{const b=$('onR');if(b&&!b.disabled)b.textContent=`🔁 Revanche annehmen${m.size>2?` (${m.have}/${m.size})`:''}`;break;}
+ case'over':{o.over=1;o.playing=false;G.over=m.result;AU.sfx(m.result);const why=(m.size>2?` – Platz ${m.place} von ${m.size}${m.result==='win'?'':', Sieger: '+esc(m.winnerName)}`:'')+({lives:'',forfeit_disconnect:' (Gegner nicht zurückgekehrt)',forfeit_left:' (Aufgabe)'}[m.reason]||'');
+  $('ov').style.display='flex';$('ov').innerHTML=`<div class="box"><h1>${m.result==='win'?'Sieg! 🏆':'Niederlage 💀'}</h1><p>${(m.result==='win'?(m.size>2?'Letzter Überlebender!':'Gegner hat verloren'):'Du hast verloren')+why}</p><button id="onR">🔁 Revanche</button><button id="onM">Online-Menü</button><button id="onE">Hauptmenü</button></div>`;
   $('onR').onclick=()=>{o.send({t:'rematch'});$('onR').disabled=true;$('onR').textContent='Warte auf Gegner…';};$('onM').onclick=()=>{netClose();onlineMenu();};$('onE').onclick=()=>{netClose();start();};break;}}}
 function netPick(o,m){$('ov').style.display='flex';$('ov').innerHTML='<div class="box"><h3>Gegner: '+String(m.opp).replace(/[<>&]/g,'')+'</h3><h3>Rasse wählen <span id="pkT"></span></h3><div class="rowb" style="flex-wrap:wrap">'+Object.entries(RACE).map(([k,R])=>`<button data-r="${k}" class="${k===race?'sel':''}" style="display:inline-block;width:auto;flex:1 1 30%;border-color:${R.c};background:linear-gradient(${R.c}55,${R.c}22)"><b style="color:${R.c2}">${R.n}</b><br><span class="small">${R.hero.n}</span></button>`).join('')+'</div><p class="small" id="rdesc">'+RACE[race].d+'</p><button id="go">Bereit</button></div>';
  $('ov').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{race=b.dataset.r;localStorage.setItem('ltw_race',race);$('ov').querySelectorAll('[data-r]').forEach(x=>x.classList.toggle('sel',x===b));$('rdesc').textContent=RACE[race].d;});

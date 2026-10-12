@@ -349,7 +349,7 @@ cv.addEventListener('pointermove',e=>{if(!PT.has(e.pointerId))return;PT.set(e.po
 // ---------- API für ui.js ----------
 const ray=new THREE.Raycaster(),ndc=new THREE.Vector2();const toScreen=v=>{const q=v.clone().project(cam),r=cv.getBoundingClientRect();return[r.left+(q.x+1)/2*r.width,r.top+(1-q.y)/2*r.height];};
 let lastT=performance.now();
-const R3D={onLane:null,lockPan:false,
+const R3D={onLane:null,lockPan:false,goLane(i){ZM=1;ZO.x=ZO.z=0;camTX=laneCX(i);if(i!==camLane){camLane=i;R3D.onLane&&R3D.onLane(i);}},
  dbg(cx,cy){const r=cv.getBoundingClientRect();ndc.set((cx-r.left)/r.width*2-1,-((cy-r.top)/r.height)*2+1);ray.setFromCamera(ndc,cam);const h=ray.intersectObjects(lanes.flatMap(L=>[L.mhit,L.shit,L.hitPlane]),false);return h.map(x=>[x.object.userData,x.point.x.toFixed(2),x.point.z.toFixed(2)]);},
  zoom(cx,cy,f){zoomAt(cx,cy,f);},consumeDrag(){const d=dragged;dragged=false;return d;},
  resize(w,h){if(!w||!h)return;VH=h;renderer.setSize(w,h,true);composer.setSize(w,h);tilt.uniforms.px.value.set(1/w,1/h);aspect=w/h;cam.aspect=aspect;cam.fov=aspect<.8?46:38;cam.updateProjectionMatrix();if(R3D._wh!==w+'x'+h){R3D._wh=w+'x'+h;fitDist();}placeCam(camX);},
@@ -433,4 +433,4 @@ fetch('assets/meshy/manifest.json').then(r=>r.ok?r.json():null).then(mf=>{if(!mf
  ld.load('assets/meshy/'+e.file,gl=>{const o=gl.scene;o.traverse(m=>{if(m.isMesh){m.castShadow=m.receiveShadow=true;{const mm=m.material;if(mm&&mm.isMeshStandardMaterial){if(mm.map){mm.map.colorSpace=THREE.SRGBColorSpace;mm.emissiveMap=mm.map;mm.emissive=new THREE.Color(0xffffff);mm.emissiveIntensity=.15;}mm.envMap=ENVT();mm.envMapIntensity=.9;mm.needsUpdate=true;}}if(e.color)m.material=new THREE.MeshStandardMaterial({color:e.color,roughness:.75,metalness:.15});}});const b=new THREE.Box3().setFromObject(o),sz=b.getSize(new THREE.Vector3());const sc=(e.height||1.6)/Math.max(.001,sz.y);o.scale.setScalar(sc);o.position.y=-b.min.y*sc;{const c=b.getCenter(new THREE.Vector3());o.position.x=-c.x*sc;o.position.z=-c.z*sc;}if(e.rotY)o.rotation.y=e.rotY;MESHY[k]=o;SPECIAL[k]&&SPECIAL[k](o,e);
   for(const L of lanes)for(const t of L.towers.values())t.userData.key='';if(k==='schrein'||k==='goldmine')for(const L of lanes){const G=k==='schrein'?L.shr:L.mine;if(G.userData.meshy)continue;G.userData.meshy=1;for(const c of G.children)if(c.isMesh&&c!==L.shit&&c!==L.mhit)c.visible=false;const m=o.clone();if(e.pos)m.position.add(new THREE.Vector3(...e.pos));G.add(m);}},undefined,err=>console.warn('Meshy-Modell fehlt',e.file,err));}}).catch(()=>{});
 window.R3D=R3D;
-const s=document.createElement('script');s.src='ui.js?v=12';document.body.appendChild(s);
+const s=document.createElement('script');s.src='ui.js?v=13';document.body.appendChild(s);
