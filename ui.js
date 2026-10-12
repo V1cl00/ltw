@@ -85,7 +85,11 @@ addEventListener('resize',layout);
 function hint(t,ms){const h=$('hint');clearTimeout(hint.t);if(!t){h.style.display='none';return;}h.textContent=t;h.style.display='block';if(ms)hint.t=setTimeout(()=>h.style.display='none',ms);}
 let race=localStorage.getItem('ltw_race')||'menschen',heroMv=0;if(!RACE[race]||RACE[race].locked)race='menschen';if(!RACE[race])race='menschen';
 function start(){if(LOC||ONL&&ONL.local){LOC=null;ONL=null;}G=newGame();G.diff=+(localStorage.getItem('ltw_diff')??1);sel=null;selT=null;pending=null;view=0;layout();
- titleScreen();}
+ titleScreen();introFly();}
+function introFly(ms=6500){if(!R3||sessionStorage.getItem('ltw_intro'))return;sessionStorage.setItem('ltw_intro','1');const o=$('ov');o.classList.add('intro');R3.startIntro(ms);
+ o.innerHTML='<div class="tbox" style="margin-top:-30vh"><div class="tsub">⚔ Turmverteidigung ⚔</div><h1 class="ttitle">Line Tower Wars</h1><div class="tline"></div></div><div class="small" style="position:absolute;bottom:96px;opacity:.75;color:#efe6cc;text-shadow:0 1px 3px #000">Tippen zum Überspringen</div>';
+ const tok=window.__introTok=(window.__introTok||0)+1;let done=0;const end=()=>{if(done||tok!==window.__introTok)return;done=1;R3.intro=null;o.classList.remove('intro');o.onpointerdown=null;titleScreen();};o.onpointerdown=end;setTimeout(end,ms);}
+window.__intro=introFly;
 function titleScreen(){AU.scene('menu');const o=$('ov');o.classList.add('ttl');o.style.display='flex';o.innerHTML='<div class="tbox"><div class="tsub">⚔ Turmverteidigung ⚔</div><h1 class="ttitle">Line Tower Wars</h1><div class="tline"></div><button class="tbtn" id="tKI"><span class="ti">🛡</span><b>Singleplayer</b><small>Gegen 1–3 KIs – Rasse & Schwierigkeit wählen</small></button><button class="tbtn" id="tON"><span class="ti">🌐</span><b>PvP</b><small>2–4 Spieler – Schnelles Spiel oder mit Code</small></button></div>';
  $('tKI').onclick=()=>{o.classList.remove('ttl');kiMenu();};$('tON').onclick=()=>{o.classList.remove('ttl');onlineMenu();};}
 const spN=()=>[2,3,4].includes(+localStorage.getItem('ltw_spn'))?+localStorage.getItem('ltw_spn'):2;
