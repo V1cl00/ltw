@@ -248,26 +248,39 @@ const linePool=[];const pvRing=selRing.clone();pvRing.material=selRing.material.
 const PITCH=.74;let VH=800;// ~49° (tiefer als zuvor, BTD6-artig)
 let camX=COLS/2+1.2,camTX=camX,vel=0,dist=30,aspect=1,camLane=0,drag=null,dragged=false;
 const laneCX=pi=>pi*LGAP+COLS/2+1.2;
-let tz=ROWS/2+.9;
+let tz=ROWS/2+.9;let ZM=1;const ZO={x:0,z:0},ZMIN=.2;
 function fitDist(){const ib=2*(R3D.insetB||0)/Math.max(1,VH),xr=aspect>1.2?COLS+2.2:COLS+.9,pts=[W(0,-.3,-1.0,1.2),W(0,xr,-1.0,1.2),W(0,-.3,ROWS+.4),W(0,xr,ROWS+.4)];tz=ROWS/2+.9;let d=30;
- const span=d=>{placeCam(laneCX(0),d);const v=pts.map(p=>p.clone().project(cam));return{ok:v.every(q=>q.z<1&&q.z>-1),x0:Math.min(...v.map(q=>q.x)),x1:Math.max(...v.map(q=>q.x)),y0:Math.min(...v.map(q=>q.y)),y1:Math.max(...v.map(q=>q.y))};};
+ const span=d=>{placeCam(laneCX(0),d,1);const v=pts.map(p=>p.clone().project(cam));return{ok:v.every(q=>q.z<1&&q.z>-1),x0:Math.min(...v.map(q=>q.x)),x1:Math.max(...v.map(q=>q.x)),y0:Math.min(...v.map(q=>q.y)),y1:Math.max(...v.map(q=>q.y))};};
  const ctr=d=>{for(let k=0;k<8;k++){const q=span(d);tz-=((q.y1+q.y0)/2-ib/2)*d*.3;}return span(d);};
  let lo=6,hi=90;for(let i=0;i<26;i++){const m=(lo+hi)/2,q=ctr(m);if(q.ok&&q.x0>-.99&&q.x1<.99&&q.y0>-.985+ib&&q.y1<.97)hi=m;else lo=m;}d=hi;ctr(d);
  dist=d;placeCam(camX,d);}
-function placeCam(x,d=dist){cam.position.set(x,Math.sin(PITCH)*d,tz+Math.cos(PITCH)*d);cam.lookAt(x,0,tz-.3);cam.updateMatrixWorld();cam.updateProjectionMatrix();
+function placeCam(x,d=dist,raw){const z=raw?1:ZM,X=x+(raw?0:ZO.x),T=tz+(raw?0:ZO.z);d*=z;cam.position.set(X,Math.sin(PITCH)*d,T+Math.cos(PITCH)*d);cam.lookAt(X,0,T-.3);cam.updateMatrixWorld();cam.updateProjectionMatrix();
  sun.position.set(x-13,13,ROWS/2-9);sun.target.position.set(x,0,ROWS/2);}
-let ptrs=0;cv.addEventListener('pointerdown',e=>{ptrs++;if(drag&&ptrs>1)return;drag={right:e.button===2,x:e.clientX,y:e.clientY,x0:e.clientX,t:performance.now(),moved:0};vel=0;});
+let ptrs=0;cv.addEventListener('pointerdown',e=>{ptrs++;if(drag&&ptrs>1)return;drag={right:e.button===2||e.button===1,x:e.clientX,y:e.clientY,x0:e.clientX,t:performance.now(),moved:0};vel=0;});
 cv.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x;drag.moved+=Math.abs(dx)+Math.abs(e.clientY-drag.y);drag.x=e.clientX;drag.y=e.clientY;
- if(R3D.lockPan&&!drag.right&&ptrs<2)return;if(Math.abs(e.clientX-drag.x0)>14){dragged=true;const k=(cam.position.y/cam.position.length())*dist*.0035*(900/Math.max(400,cv.clientHeight));const mv=-dx*k*1.4;camTX=camX=Math.max(laneCX(0)-3,Math.min(laneCX(1)+3,camX+mv));vel=mv/Math.max(1,(performance.now()-drag.t))*16;drag.t=performance.now();}});
-const endDrag=()=>{if(!drag)return;if(dragged){const pr=camX+vel*12,lane=pr>(laneCX(0)+laneCX(1))/2?1:0;camTX=laneCX(lane);if(lane!==camLane){camLane=lane;R3D.onLane&&R3D.onLane(lane);}}drag=null;};
-const pu=()=>{ptrs=Math.max(0,ptrs-1);if(!ptrs)endDrag();};cv.addEventListener('pointerup',pu);cv.addEventListener('pointercancel',pu);cv.addEventListener('contextmenu',e=>e.preventDefault());
+ if(ptrs>=2)return;if(drag.right||ZM<.98&&!R3D.lockPan){if(drag.moved>6){dragged=true;panBy(drag.px??e.clientX-dx,drag.py??drag.y,e.clientX,e.clientY);}drag.px=e.clientX;drag.py=e.clientY;return;}if(R3D.lockPan)return;if(Math.abs(e.clientX-drag.x0)>14){dragged=true;const k=(cam.position.y/cam.position.length())*dist*.0035*(900/Math.max(400,cv.clientHeight));const mv=-dx*k*1.4;camTX=camX=Math.max(laneCX(0)-3,Math.min(laneCX(1)+3,camX+mv));vel=mv/Math.max(1,(performance.now()-drag.t))*16;drag.t=performance.now();}});
+const endDrag=()=>{if(!drag)return;if(dragged&&ZM>=.98&&!drag.right){const pr=camX+vel*12,lane=pr>(laneCX(0)+laneCX(1))/2?1:0;camTX=laneCX(lane);if(lane!==camLane){camLane=lane;R3D.onLane&&R3D.onLane(lane);}}drag=null;};
+const pu=e=>{PT.delete(e.pointerId);pinch=null;ptrs=Math.max(0,ptrs-1);if(!ptrs)endDrag();};
+// ---------- Zoom (Mausrad / Pinch, zum Zeiger hin) + Schwenken im Zoom ----------
+const gPlane=new THREE.Plane(new THREE.Vector3(0,1,0),0),gRay=new THREE.Raycaster(),gN=new THREE.Vector2();
+function groundAt(cx,cy){const r=cv.getBoundingClientRect();gN.set((cx-r.left)/r.width*2-1,-((cy-r.top)/r.height)*2+1);gRay.setFromCamera(gN,cam);const p=new THREE.Vector3();return gRay.ray.intersectPlane(gPlane,p)?p:null;}
+function clampZO(){const f=(1-ZM)/(1-ZMIN),lx=(COLS/2+1)*f,lz=(ROWS/2+1)*f;ZO.x=Math.max(-lx,Math.min(lx,ZO.x));ZO.z=Math.max(-lz,Math.min(lz,ZO.z));if(ZM>=.999){ZO.x=ZO.z=0;}zBtn.style.display=ZM<.98?'block':'none';}
+function panBy(x0,y0,x1,y1){const a=groundAt(x0,y0),b=groundAt(x1,y1);if(!a||!b)return;ZO.x-=b.x-a.x;ZO.z-=b.z-a.z;clampZO();placeCam(camX);}
+function zoomAt(cx,cy,f){const a=groundAt(cx,cy);ZM=Math.max(ZMIN,Math.min(1,ZM*f));clampZO();placeCam(camX);const b=groundAt(cx,cy);if(a&&b){ZO.x+=a.x-b.x;ZO.z+=a.z-b.z;}clampZO();placeCam(camX);}
+const zBtn=document.createElement('button');zBtn.textContent='⤢ Ansicht';zBtn.title='Zoom zurücksetzen';zBtn.style.cssText='position:fixed;right:8px;top:48px;z-index:8;display:none;padding:4px 10px;border-radius:12px;border:1px solid #f2d38a;background:rgba(20,15,40,.75);color:#f2d38a;font:bold 13px system-ui';document.body.appendChild(zBtn);
+zBtn.addEventListener('click',()=>{ZM=1;ZO.x=ZO.z=0;clampZO();placeCam(camX);});
+cv.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.clientX,e.clientY,Math.exp(e.deltaY*.0015));},{passive:false});
+const PT=new Map();let pinch=null;
+cv.addEventListener('pointerdown',e=>{PT.set(e.pointerId,{x:e.clientX,y:e.clientY});if(PT.size===2){const[a,b]=[...PT.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),cx:(a.x+b.x)/2,cy:(a.y+b.y)/2};}});
+cv.addEventListener('pointermove',e=>{if(!PT.has(e.pointerId))return;PT.set(e.pointerId,{x:e.clientX,y:e.clientY});if(PT.size<2||!pinch)return;const[a,b]=[...PT.values()],d=Math.hypot(a.x-b.x,a.y-b.y),cx=(a.x+b.x)/2,cy=(a.y+b.y)/2;dragged=true;
+ panBy(pinch.cx,pinch.cy,cx,cy);if(pinch.d>10&&d>10)zoomAt(cx,cy,pinch.d/d);pinch={d,cx,cy};});cv.addEventListener('pointerup',pu);cv.addEventListener('pointercancel',pu);cv.addEventListener('contextmenu',e=>e.preventDefault());
 // ---------- API für ui.js ----------
 const ray=new THREE.Raycaster(),ndc=new THREE.Vector2();const toScreen=v=>{const q=v.clone().project(cam),r=cv.getBoundingClientRect();return[r.left+(q.x+1)/2*r.width,r.top+(1-q.y)/2*r.height];};
 let lastT=performance.now();
 const R3D={onLane:null,lockPan:false,
  dbg(cx,cy){const r=cv.getBoundingClientRect();ndc.set((cx-r.left)/r.width*2-1,-((cy-r.top)/r.height)*2+1);ray.setFromCamera(ndc,cam);const h=ray.intersectObjects(lanes.flatMap(L=>[L.mhit,L.shit,L.hitPlane]),false);return h.map(x=>[x.object.userData,x.point.x.toFixed(2),x.point.z.toFixed(2)]);},
- consumeDrag(){const d=dragged;dragged=false;return d;},
- resize(w,h){if(!w||!h)return;VH=h;renderer.setSize(w,h,true);composer.setSize(w,h);tilt.uniforms.px.value.set(1/w,1/h);aspect=w/h;cam.aspect=aspect;cam.fov=aspect<.8?46:38;cam.updateProjectionMatrix();fitDist();placeCam(camX);},
+ zoom(cx,cy,f){zoomAt(cx,cy,f);},consumeDrag(){const d=dragged;dragged=false;return d;},
+ resize(w,h){if(!w||!h)return;VH=h;renderer.setSize(w,h,true);composer.setSize(w,h);tilt.uniforms.px.value.set(1/w,1/h);aspect=w/h;cam.aspect=aspect;cam.fov=aspect<.8?46:38;cam.updateProjectionMatrix();if(R3D._wh!==w+'x'+h){R3D._wh=w+'x'+h;fitDist();}placeCam(camX);},
  pick(cx,cy){const r=cv.getBoundingClientRect();ndc.set((cx-r.left)/r.width*2-1,-((cy-r.top)/r.height)*2+1);ray.setFromCamera(ndc,cam);
   const hits=ray.intersectObjects(lanes.flatMap(L=>[L.mhit,L.shit,L.hitPlane]),false);if(!hits.length)return null;const h=hits[0],u=h.object.userData;
   if(u.mine)return{mine:u.pi};if(u.schrein)return{schrein:u.pi};const fx=h.point.x-u.pi*LGAP,fy=h.point.z,x=Math.floor(fx),y=Math.floor(fy);if(x<0||y<0||x>=COLS||y>=ROWS)return null;return{pi:u.pi,x,y,fx,fy};},
@@ -341,4 +354,4 @@ fetch('assets/meshy/manifest.json').then(r=>r.ok?r.json():null).then(mf=>{if(!mf
  ld.load('assets/meshy/'+e.file,gl=>{const o=gl.scene;o.traverse(m=>{if(m.isMesh){m.castShadow=m.receiveShadow=true;if(e.color)m.material=new THREE.MeshStandardMaterial({color:e.color,roughness:.75,metalness:.15});}});const b=new THREE.Box3().setFromObject(o),sz=b.getSize(new THREE.Vector3());const sc=(e.height||1.6)/Math.max(.001,sz.y);o.scale.setScalar(sc);o.position.y=-b.min.y*sc;{const c=b.getCenter(new THREE.Vector3());o.position.x=-c.x*sc;o.position.z=-c.z*sc;}if(e.rotY)o.rotation.y=e.rotY;MESHY[k]=o;
   for(const L of lanes)for(const t of L.towers.values())t.userData.key='';},undefined,err=>console.warn('Meshy-Modell fehlt',e.file,err));}}).catch(()=>{});
 window.R3D=R3D;
-const s=document.createElement('script');s.src='ui.js?v=4';document.body.appendChild(s);
+const s=document.createElement('script');s.src='ui.js?v=5';document.body.appendChild(s);

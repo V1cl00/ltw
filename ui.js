@@ -173,7 +173,7 @@ function updLine(){if(!dragB)return;const P=planBuild(G.p[0],sel,dragB.cells.map
  hint(line.cells.length>1?`${P.n}× ${TT[sel].n} · ${P.cost}💰${P.n<line.cells.length?' ('+(line.cells.length-P.n)+' ungültig)':''}${dragB.touch?' – in Linie tippen zum Bauen':''}`:'');}
 function buildLine(){if(!line)return;const ok=line.cells.filter(c=>c.ok).map(c=>[c.x,c.y]);const n=command(G,0,{op:'buildMany',type:line.type,cells:ok});line=null;dragB=null;hint('');
  if(n){AU.sfx('build');if(navigator.vibrate)navigator.vibrate(12);}else AU.sfx('no');ui();}
-cv.addEventListener('pointerdown',e=>{ptrN++;if(ptrN>1||e.button===2){dragB=null;if(R3)R3.lockPan=false;return;}
+cv.addEventListener('pointerdown',e=>{ptrN++;if(ptrN>1||e.button===2||e.button===1){dragB=null;if(R3)R3.lockPan=false;return;}
  if(!G||!sel||sel==='master'||!TT[sel])return;const c=cellAt(e);if(!c||c.pi!==0)return;if(line)return;// Bestätigung folgt im pointerup
  const touch=e.pointerType!=='mouse';dragB={cells:[c],touch,active:!touch,x0:e.clientX,y0:e.clientY};if(R3)R3.lockPan=true;
  if(touch)dragB.holdT=setTimeout(()=>{if(dragB){dragB.active=true;if(navigator.vibrate)navigator.vibrate(8);updLine();}},300);});
