@@ -182,12 +182,13 @@ function elemStats(t,s){const D=elemDef(t);if(!D)return;const lv=D.lv,mul=LMUL[l
  s.ground=0;applyMods(s,D.m,mul,D.sc);if(lv>=5&&D.l5)applyMods(s,D.l5,1,[]);
  s.dmg*=1+.15*(lv-1);if(s.slowDur)s.slowDur*=dm;if(s.slow)s.slow=Math.min(.6,s.slow*dm);if(s.aura){if(s.aura.rateMul)s.aura.rateMul=1-(1-s.aura.rateMul)*mul;}
  s.el=D;}
-function canSlot(p,t,e){if(!t||t.type!=='element'||!(p.runes?.[e]>0))return null;const el=t.el||(t.el=[]),i=el.findIndex(r=>r.e===e);
- if(i>=0)return null;if(!el.length)return{kind:'new',cost:0};
- if(el.length===1&&COMBO[comboKey(el[0].e,e)])return{kind:'fuse',cost:FUSE_COST};return null;}
-const RUNE_MAX=2;function buyRune(p,e){if(!ELEM[e]||p.gold<RUNE_COST||(p.runeBuys||0)>=RUNE_MAX)return false;p.runeBuys=(p.runeBuys||0)+1;p.gold-=RUNE_COST;p.runes=p.runes||{};p.runes[e]=(p.runes[e]||0)+1;return true;}
-function slotRune(p,t,e){const c=canSlot(p,t,e);if(!c||p.gold<c.cost)return false;p.gold-=c.cost;p.runes[e]--;t.spent+=c.cost+RUNE_COST;t.upT=p.now||0;
- t.el.push({e,lv:1});return c.kind;}
+// Elemente: am Schrein je Element max. 1x freischalten, max. 2 verschiedene; Element-Turm kostenlos auf ein freigeschaltetes Element umstellen (keine Mischungen/Stapel)
+function canSlot(p,t,e){if(!t||t.type!=='element'||!(p.runes?.[e]>0))return null;const el=t.el||(t.el=[]);if(el.length&&el[0].e===e)return null;return{kind:el.length?'switch':'new',cost:0};}
+const RUNE_MAX=2,activeEls=p=>Object.keys(p.runes||{}).filter(k=>p.runes[k]>0);
+function dropRune(p,e){if(!(p.runes?.[e]>0))return false;delete p.runes[e];for(const t of p.towers)if(t.el&&t.el.length&&t.el[0].e===e)t.el=[];return true;}
+function buyRune(p,e){if(!ELEM[e]||p.gold<RUNE_COST||p.runes?.[e]>0||activeEls(p).length>=RUNE_MAX)return false;p.gold-=RUNE_COST;p.runes=p.runes||{};p.runes[e]=1;return true;}
+function slotRune(p,t,e){const c=canSlot(p,t,e);if(!c||p.gold<c.cost)return false;p.gold-=c.cost;t.upT=p.now||0;
+ t.el=[{e,lv:1}];return c.kind;}
 function elemCount(p){return p.towers.filter(t=>t.type==='element').length;}
 // Auren (Unterstützer): stärkster Buff gilt, nicht stapelnd
 function stepAuras(p,G){for(const t of p.towers)t.buff=null;for(const a of p.towers){if(TT[a.type]?.wall||(a.type==='element'&&!a.el?.length))continue;if(a.type!=='element'&&!TT[a.type]?.b?.aura)continue;const s=tStats(a,1);if(!s.aura)continue;
@@ -326,12 +327,11 @@ function defEval(p){let dps=0,air=0,camo=0,phys=0;
 const recent=(log,t,w)=>(log||[]).filter(e=>(e[0]??e)>t-w);
 // KI: Runen am Schrein kaufen und in Element-Türme setzen (Konter: Luft vs Flieger, Licht vs Tarnung, sonst Kombos)
 function aiRunes(G,p,danger,needAir,needCamo){const R=Math.random;if(R()>(danger?.6:.35))return;
- const ts=p.towers.filter(t=>t.type==='element');if(!ts.length)return;const t=ts.reduce((a,b)=>((a.el||[]).length+a.up[0]<=(b.el||[]).length+b.up[0]?a:b));const el=t.el||[];let e;
- if(!el.length)e=needAir?'luft':needCamo?'licht':['feuer','erde','blitz','eis','wasser','schatten'][Math.floor(R()*6)];
- else if(el.length===1){const ks=Object.keys(COMBO).filter(k=>k.split('+').includes(el[0].e));e=R()<.75&&ks.length?ks[Math.floor(R()*ks.length)].split('+').find(x=>x!==el[0].e):el[0].e;}
- else e=null;
+ const ts=p.towers.filter(t=>t.type==='element');if(!ts.length)return;const t=ts.reduce((a,b)=>((a.el||[]).length+a.up[0]<=(b.el||[]).length+b.up[0]?a:b));const el=t.el||[];let e=null;p.runes=p.runes||{};const own=Object.keys(p.runes).filter(k=>p.runes[k]>0),want=needAir?'luft':needCamo?'licht':null;if(want&&!own.includes(want)&&own.length>=RUNE_MAX&&p.gold>=RUNE_COST+5){dropRune(p,own[0]);own.shift();}
+ if(want&&(own.includes(want)||own.length<RUNE_MAX)&&(!el.length||el[0].e!==want))e=want;
+ else if(!el.length)e=own.length&&(own.length>=RUNE_MAX||R()<.5)?own[Math.floor(R()*own.length)]:['feuer','erde','blitz','eis','wasser','schatten'].filter(k=>!own.includes(k))[Math.floor(R()*5)];
  if(el.length&&canUp(t,0)&&p.gold>=upCost(t,0)+15&&R()<.5){upgrade(p,t,0);return;}if(!e)return;
- p.runes=p.runes||{};const need=(p.runes[e]?0:RUNE_COST);if(!(p.runes[e]>0)&&p.gold<need+5)return;if(!(p.runes[e]>0)&&!buyRune(p,e))return;const c=canSlot(p,t,e);if(c&&p.gold>=c.cost+10)slotRune(p,t,e);}
+ p.runes=p.runes||{};const need=(p.runes[e]?0:RUNE_COST);if(!(p.runes[e]>0)&&p.gold<need+5)return;if(!(p.runes[e]>0)&&!buyRune(p,e))return;const c=canSlot(p,t,e);if(c)slotRune(p,t,e);}
 // KI-Platzierung: Schadenstürme dorthin, wo sie die meisten Pfadzellen abdecken (Kurven/U-Turns, mittleres/spätes Labyrinth).
 // Kandidaten = vorhandene Mauern (werden ersetzt) + geplante Mauerzellen -> Labyrinth bleibt intakt. Splash bevorzugt Kurven, Slow früh im Pfad.
 function spotScore(p,ty,x,y,path,turn){const r=ty==='element'?3:TT[ty].b.rng||2.5,L=path.length||1,slow=ty==='frost',splash=ty==='kanone';let sc=0;
@@ -440,5 +440,5 @@ function getSnapshot(G){return{t:G.t,over:G.over,tick:G.tick,cols:COLS,rows:ROWS
 function command(G,pi,c){const p=G.p[pi],T=c.id!=null?p.towers.find(t=>t.id===c.id):null;
  switch(c.op){case'build':return !!build(p,c.type,c.x,c.y);case'placeMaster':return !!placeMaster(p,c.x,c.y);case'pickMaster':return pickMaster(p,c.key);
   case'upgrade':return !!T&&upgrade(p,T,c.path);case'sell':if(!T||T.master)return false;sell(p,T);return true;case'target':if(!T||!TGT.includes(c.mode))return false;T.tgt=c.mode;return true;
-  case'send':return sendCreep(G,pi,c.creep);case'collect':return collect(p);case'worker':return buyWorker(p);case'mineUp':return mineUp(p);case'pickRace':return pickRace(p,c.race);case'heroMove':return heroMove(p,c.x,c.y);case'heroAbility':return heroAbility(G,pi,c.i);case'buildMany':return buildMany(p,c.type,c.cells);case'buyRune':return buyRune(p,c.e);case'slotRune':return slotRune(p,T,c.e);case'masterUp':return mUp(p);}return false;}
-if(typeof module!=='undefined')module.exports={aiHero,raceMix,RACE,raceTowers,ABIL,SPECIAL,pickRace,heroAbility,heroMove,heroXpNeed,heroStats,ctAvail,sendCd,planBuild,buildMany,aiPlaceDmg,pathCoverage,ELEM,COMBO,RUNE_COST,RUNE_MAX,FUSE_COST,LVL_COST,buyRune,slotRune,canSlot,elemDef,comboKey,typeCount,getSnapshot,command,tracePath,EVT,evOn,MINE,buyWorker,mineUp,collect,workerCost,creepCost,ECO,incGain,defEval,aiThink,newGame,step,build,canPlace,sell,upgrade,canUp,tStats,sendCreep,pickMaster,placeMaster,mUp,bfs,pickTarget,dmgMul,COLS,ROWS,SPAWN,TT,CT};
+  case'send':return sendCreep(G,pi,c.creep);case'collect':return collect(p);case'worker':return buyWorker(p);case'mineUp':return mineUp(p);case'pickRace':return pickRace(p,c.race);case'heroMove':return heroMove(p,c.x,c.y);case'heroAbility':return heroAbility(G,pi,c.i);case'buildMany':return buildMany(p,c.type,c.cells);case'buyRune':return buyRune(p,c.e);case'dropRune':return dropRune(p,c.e);case'slotRune':return slotRune(p,T,c.e);case'masterUp':return mUp(p);}return false;}
+if(typeof module!=='undefined')module.exports={aiHero,raceMix,RACE,raceTowers,ABIL,SPECIAL,pickRace,heroAbility,heroMove,heroXpNeed,heroStats,ctAvail,sendCd,planBuild,buildMany,aiPlaceDmg,pathCoverage,ELEM,COMBO,RUNE_COST,RUNE_MAX,dropRune,activeEls,FUSE_COST,LVL_COST,buyRune,slotRune,canSlot,elemDef,comboKey,typeCount,getSnapshot,command,tracePath,EVT,evOn,MINE,buyWorker,mineUp,collect,workerCost,creepCost,ECO,incGain,defEval,aiThink,newGame,step,build,canPlace,sell,upgrade,canUp,tStats,sendCreep,pickMaster,placeMaster,mUp,bfs,pickTarget,dmgMul,COLS,ROWS,SPAWN,TT,CT};

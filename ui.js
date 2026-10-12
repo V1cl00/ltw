@@ -52,7 +52,7 @@ const TUT=['<b>Willkommen bei Line Tower Wars!</b><br>Gegner-Kreaturen laufen ob
  '<b>🏗 Bauen</b><br>Wähle unten einen Turm und tippe auf ein Feld deiner Bahn (grün = möglich), erneut tippen baut. Mauern sind gratis (max. 40) – reine Wegblocker.',
  '<b>🌀 Labyrinth</b><br>Kreaturen laufen um deine Türme herum. Baue ein langes Labyrinth! Den Weg komplett zu blockieren ist nicht erlaubt.',
  '<b>⚔ Senden</b><br>Schicke Kreaturen zur KI. Das kostet Gold, erhöht aber dauerhaft dein Einkommen (alle 10s). Kommt eine durch, stiehlst du der KI ein Leben ❤! Achte auf Tarnung 👁 und Rüstung 🛡!',
- '<b>✦ Schrein & Element-Turm</b><br>Neben deinem Feld steht der Schrein: kaufe dort Runen (8 Elemente). Baue einen Element-Turm, tippe ihn an und setze Runen ein. Die Rune wählt das Element, Stufen kaufst du per Aufwerten mit Gold; zwei verschiedene = Spezial-Element (z. B. Feuer+Wasser = Dampf).',
+ '<b>✦ Schrein & Element-Turm</b><br>Neben deinem Feld steht der Schrein: aktiviere dort bis zu 2 Elemente gleichzeitig (je 1×, tauschbar). Baue einen Element-Turm, tippe ihn an und stelle ihn gratis auf ein freigeschaltetes Element um, Stufen kaufst du per Aufwerten mit Gold; zwei verschiedene = Spezial-Element (z. B. Feuer+Wasser = Dampf).',
  '<b>⬆ Aufwerten</b><br>Tippe auf einen Turm: 2 Upgrade-Pfade, Zielwahl und Verkaufen. Lange drücken zeigt Infos zu Türmen und Kreaturen.'];
 let tutI=0,tutPaused=false;
 function tut(show){if(show){tutI=0;tutPaused=paused;paused=true;$('tut').style.display='flex';$('tutT').innerHTML=TUT[0];}else{$('tut').style.display='none';paused=tutPaused;localStorage.setItem('ltw_tut','1');}}
@@ -81,12 +81,12 @@ function start(){G=newGame();G.diff=+(localStorage.getItem('ltw_diff')??1);sel=n
  $('ov').querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{G.diff=+b.dataset.d;localStorage.setItem('ltw_diff',G.diff);$('ov').querySelectorAll('[data-d]').forEach(x=>x.classList.toggle('sel',x===b));});
  $('ov').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{race=b.dataset.r;localStorage.setItem('ltw_race',race);$('ov').querySelectorAll('[data-r]').forEach(x=>x.classList.toggle('sel',x===b));$('rdesc').textContent=RACE[race].d;});
  $('go').onclick=()=>{pickRace(G.p[0],race);document.documentElement.style.setProperty('--rc',RACE[race].c2);document.documentElement.style.setProperty('--rc2',RACE[race].c);G.started=1;AU.sfx('start');tab='bau';$('ov').style.display='none';ui();if(!localStorage.getItem('ltw_tut'))tut(true);};}
-function elDesc(t){const D=elemDef(t);return D?`<span style="color:${D.c}">${D.ico} ${D.n} Lv${D.lv}</span> <span class="small">${D.d}${D.lv>=5&&D.l5?' + Lv5-Bonus':''}${t.buff?' · ✨ Aura':''}</span>`:'<span class="small">Keine Rune – im Schrein kaufen und hier einsetzen</span>';}
+function elDesc(t){const D=elemDef(t);return D?`<span style="color:${D.c}">${D.ico} ${D.n} Lv${D.lv}</span> <span class="small">${D.d}${D.lv>=5&&D.l5?' + Lv5-Bonus':''}${t.buff?' · ✨ Aura':''}</span>`:'<span class="small">Kein Element – im Schrein freischalten, hier gratis wählen</span>';}
 function elemPanel(p,t){const rs=Object.keys(ELEM);return `<div style="flex:1 1 100%;margin-bottom:4px">${elDesc(t)}</div><div class="runes">`+rs.map(e=>{const E=ELEM[e],n=p.runes?.[e]||0,c=n?canSlot(p,t,e):null;
- const lab=!n?'keine Rune':!c?'nicht möglich':c.kind==='new'?'wählen':'→ '+COMBO[comboKey(t.el[0].e,e)].n;
- return `<button data-act="slot" data-e="${e}" ${!c||p.gold<c.cost?'disabled':''}><span class="ico" style="color:${E.c}">${E.ico}</span>${E.n} ×${n}<span class="small">${lab}</span></button>`;}).join('')+'</div>';}
-function schreinPanel(p){return ((p.runeBuys||0)>=2?'<div class="small" style="flex:1 1 100%">🔒 Schrein gesperrt (2/2 Elemente gewählt)</div>':`<div class="small" style="flex:1 1 100%">Elementwahl ${p.runeBuys||0}/2</div>`)+Object.entries(ELEM).map(([e,E])=>`<button data-act="rune" data-e="${e}" ${p.gold<RUNE_COST||(p.runeBuys||0)>=2?'disabled':''}><span class="ico" style="color:${E.c}">${E.ico}</span>${E.n} <b>×${p.runes?.[e]||0}</b><span class="small"><b style="color:#FFC93C">${RUNE_COST}💰</b> · ${E.role}</span><span class="small">${E.d}</span></button>`).join('')+
- `<div class="small" style="align-self:center;min-width:150px">Element-Türme: ${typeCount(p,'element')}/${TT.element.max}<br>Turm antippen → Rune einsetzen.<br>1 Rune = Element, 2 verschiedene = Spezial.<br>Stufe: Turm mit Gold aufwerten</div>`;}
+ const lab=!n?'nicht freigeschaltet':!c?'aktiv':'gratis umstellen';
+ return `<button data-act="slot" data-e="${e}" ${!c||p.gold<c.cost?'disabled':''}><span class="ico" style="color:${E.c}">${E.ico}</span>${E.n}<span class="small">${lab}</span></button>`;}).join('')+'</div>';}
+function schreinPanel(p){const na=activeEls(p).length;return `<div class="small" style="flex:1 1 100%">Aktive Elemente ${na}/2${na>=2?' – aktives Element antippen zum Entfernen/Tauschen':''}</div>`+Object.entries(ELEM).map(([e,E])=>`<button data-act="${p.runes?.[e]>0?'unrune':'rune'}" data-e="${e}" ${p.runes?.[e]>0?'style="outline:2px solid #FFC93C"':p.gold<RUNE_COST||na>=2?'disabled':''}><span class="ico" style="color:${E.c}">${E.ico}</span>${E.n} <b>${p.runes?.[e]>0?'✓ aktiv (entfernen)':''}</b><span class="small"><b style="color:#FFC93C">${RUNE_COST}💰</b> · ${E.role}</span><span class="small">${E.d}</span></button>`).join('')+
+ `<div class="small" style="align-self:center;min-width:150px">Element-Türme: ${typeCount(p,'element')}/${TT.element.max}<br>Max. 2 Elemente gleichzeitig aktiv, tauschbar.<br>Turm antippen → gratis auf Element umstellen.<br>Stufe: Turm mit Gold aufwerten</div>`;}
 function mDesc(k,l){const s=mStats(k,l);if(k==='blitzmeister')return `${s.targets} Ziele, ${s.dmg} Schaden, alle ${s.rate.toFixed(1)}s${s.camo?', sieht Tarnung':''}`;
  if(k==='frostmeister')return `Puls alle ${s.rate.toFixed(1)}s: −${Math.round(s.slow*100)}% Tempo für ${s.dur}s, ${s.dmg} Schaden`;return `+${s.inc} Einkommen/Tick, +${Math.round(s.kill*100)}% Killgold`;}
 let lastP='',lastS='';
@@ -131,7 +131,7 @@ function act(e){const b=e.target.closest('[data-act]');if(!b||b.disabled)return;
  else if(a==='hmove'){heroMv=!heroMv;sel=null;pending=null;if(heroMv&&view)view=0,layout();}
  else if(a==='worker'){if(command(G,0,{op:'worker'}))AU.sfx('build');}
  else if(a==='mineup'){if(command(G,0,{op:'mineUp'}))AU.sfx('up');}
- else if(a==='rune'){if(command(G,0,{op:'buyRune',e:b.dataset.e}))AU.sfx('coin');}
+ else if(a==='rune'){if(command(G,0,{op:'buyRune',e:b.dataset.e}))AU.sfx('coin');}else if(a==='unrune'){if(command(G,0,{op:'dropRune',e:b.dataset.e}))AU.sfx('tap');}
  else if(a==='slot'){const k=command(G,0,{op:'slotRune',id:selT.id,e:b.dataset.e});if(k){AU.sfx('up');const D=elemDef(selT);pop((k==='fuse'?'Fusion: ':'')+D.ico+' '+D.n+' Lv'+D.lv,D.c);}}
  else if(a==='mup'){if(command(G,0,{op:'masterUp'}))AU.sfx('up');}
  else if(a==='up'){if(command(G,0,{op:'upgrade',id:selT.id,path:+b.dataset.pa}))AU.sfx('up');}
@@ -177,7 +177,7 @@ cv.addEventListener('pointerdown',e=>{ptrN++;if(ptrN>1||e.button===2){dragB=null
  if(!G||!sel||sel==='master'||!TT[sel])return;const c=cellAt(e);if(!c||c.pi!==0)return;if(line)return;// Bestätigung folgt im pointerup
  const touch=e.pointerType!=='mouse';dragB={cells:[c],touch,active:!touch,x0:e.clientX,y0:e.clientY};if(R3)R3.lockPan=true;
  if(touch)dragB.holdT=setTimeout(()=>{if(dragB){dragB.active=true;if(navigator.vibrate)navigator.vibrate(8);updLine();}},300);});
-cv.addEventListener('pointermove',e=>{if(!dragB||ptrN>1)return;if(!dragB.active){if(Math.hypot(e.clientX-dragB.x0,e.clientY-dragB.y0)>10){clearTimeout(dragB.holdT);dragB=null;}return;}
+cv.addEventListener('pointermove',e=>{if(!dragB||ptrN>1)return;if(!dragB.active){if(Math.hypot(e.clientX-dragB.x0,e.clientY-dragB.y0)>10){clearTimeout(dragB.holdT);dragB.active=true;}else return;}
  const c=cellAt(e);if(!c||c.pi!==0)return;const last=dragB.cells[dragB.cells.length-1];if(c.x===last.x&&c.y===last.y)return;
  for(const q of lineCells(last,c))if(!dragB.cells.some(o=>o.x===q.x&&o.y===q.y))dragB.cells.push(q);dragB.moved=1;updLine();});
 addEventListener('pointerup',()=>{ptrN=Math.max(0,ptrN-1);});addEventListener('pointercancel',()=>{ptrN=Math.max(0,ptrN-1);});
