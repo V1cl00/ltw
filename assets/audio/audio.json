@@ -1,0 +1,228 @@
+{
+ "version": 1,
+ "events": {
+  "ambient_garden": {
+   "src": [
+    "assets/audio/ambient_garden.ogg",
+    "assets/audio/ambient_garden.mp3"
+   ],
+   "type": "ambient",
+   "loop": true,
+   "volume": 0.4,
+   "duration": 44.74
+  },
+  "build": {
+   "src": [
+    "assets/audio/build.ogg",
+    "assets/audio/build.mp3"
+   ],
+   "type": "sfx",
+   "loop": false,
+   "volume": 0.7,
+   "duration": 0.31
+  },
+  "defeat": {
+   "src": [
+    "assets/audio/defeat.ogg",
+    "assets/audio/defeat.mp3"
+   ],
+   "type": "jingle",
+   "loop": false,
+   "volume": 0.8,
+   "duration": 0.54
+  },
+  "gold": {
+   "src": [
+    "assets/audio/gold.ogg",
+    "assets/audio/gold.mp3"
+   ],
+   "type": "sfx",
+   "loop": false,
+   "volume": 0.7,
+   "duration": 0.85
+  },
+  "hero_move": {
+   "src": [
+    "assets/audio/hero_move.ogg",
+    "assets/audio/hero_move.mp3"
+   ],
+   "type": "sfx",
+   "loop": false,
+   "volume": 0.7,
+   "duration": 0.67
+  },
+  "impact": {
+   "src": [
+    "assets/audio/impact.ogg",
+    "assets/audio/impact.mp3"
+   ],
+   "type": "sfx",
+   "loop": false,
+   "volume": 0.7,
+   "duration": 0.18
+  },
+  "leak": {
+   "src": [
+    "assets/audio/leak.ogg",
+    "assets/audio/leak.mp3"
+   ],
+   "type": "sfx",
+   "loop": false,
+   "volume": 0.7,
+   "duration": 0.5
+  },
+  "music_battle": {
+   "src": [
+    "assets/audio/music_battle.ogg",
+    "assets/audio/music_battle.mp3"
+   ],
+   "type": "music",
+   "loop": true,
+   "volume": 0.5,
+   "duration": 57.73
+  },
+  "music_menu": {
+   "src": [
+    "assets/audio/music_menu.ogg",
+    "assets/audio/music_menu.mp3"
+   ],
+   "type": "music",
+   "loop": true,
+   "volume": 0.5,
+   "duration": 64.0
+  },
+  "sell": {
+   "src": [
+    "assets/audio/sell.ogg",
+    "assets/audio/sell.mp3"
+   ],
+   "type": "sfx",
+   "loop": false,
+   "volume": 0.7,
+   "duration": 0.34
+  },
+  "send_unit": {
+   "src": [
+    "assets/audio/send_unit.ogg",
+    "assets/audio/send_unit.mp3"
+   ],
+   "type": "sfx",
+   "loop": false,
+   "volume": 0.7,
+   "duration": 0.31
+  },
+  "shot_esse_pulse": {
+   "src": [
+    "assets/audio/shot_esse_pulse.ogg",
+    "assets/audio/shot_esse_pulse.mp3"
+   ],
+   "type": "sfx",
+   "loop": false,
+   "volume": 0.7,
+   "duration": 0.18
+  },
+  "shot_funkenwerfer": {
+   "src": [
+    "assets/audio/shot_funkenwerfer.ogg",
+    "assets/audio/shot_funkenwerfer.mp3"
+   ],
+   "type": "sfx",
+   "loop": false,
+   "volume": 0.7,
+   "duration": 0.14
+  },
+  "shot_glocke": {
+   "src": [
+    "assets/audio/shot_glocke.ogg",
+    "assets/audio/shot_glocke.mp3"
+   ],
+   "type": "sfx",
+   "loop": false,
+   "volume": 0.7,
+   "duration": 1.74
+  },
+  "shot_lichtspeer": {
+   "src": [
+    "assets/audio/shot_lichtspeer.ogg",
+    "assets/audio/shot_lichtspeer.mp3"
+   ],
+   "type": "sfx",
+   "loop": false,
+   "volume": 0.7,
+   "duration": 0.45
+  },
+  "shot_wachfeuer": {
+   "src": [
+    "assets/audio/shot_wachfeuer.ogg",
+    "assets/audio/shot_wachfeuer.mp3"
+   ],
+   "type": "sfx",
+   "loop": false,
+   "volume": 0.7,
+   "duration": 0.64
+  },
+  "transform": {
+   "src": [
+    "assets/audio/transform.ogg",
+    "assets/audio/transform.mp3"
+   ],
+   "type": "sfx",
+   "loop": false,
+   "volume": 0.7,
+   "duration": 0.41
+  },
+  "ui_click": {
+   "src": [
+    "assets/audio/ui_click.ogg",
+    "assets/audio/ui_click.mp3"
+   ],
+   "type": "sfx",
+   "loop": false,
+   "volume": 0.7,
+   "duration": 0.01
+  },
+  "ui_hover": {
+   "src": [
+    "assets/audio/ui_hover.ogg",
+    "assets/audio/ui_hover.mp3"
+   ],
+   "type": "sfx",
+   "loop": false,
+   "volume": 0.7,
+   "duration": 0.02
+  },
+  "upgrade": {
+   "src": [
+    "assets/audio/upgrade.ogg",
+    "assets/audio/upgrade.mp3"
+   ],
+   "type": "sfx",
+   "loop": false,
+   "volume": 0.7,
+   "duration": 0.38
+  },
+  "victory": {
+   "src": [
+    "assets/audio/victory.ogg",
+    "assets/audio/victory.mp3"
+   ],
+   "type": "jingle",
+   "loop": false,
+   "volume": 0.8,
+   "duration": 0.8
+  },
+  "wave_tick": {
+   "src": [
+    "assets/audio/wave_tick.ogg",
+    "assets/audio/wave_tick.mp3"
+   ],
+   "type": "sfx",
+   "loop": false,
+   "volume": 0.7,
+   "duration": 0.12,
+   "alias": [
+    "income_tick"
+   ]
+  }
+ }
+}

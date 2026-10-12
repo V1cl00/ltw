@@ -1,0 +1,12 @@
+All audio in this folder is CC0 1.0 (public domain dedication). Converted/trimmed/mixed with ffmpeg.
+Kenney (www.kenney.nl), CC0: Interface Sounds, Impact Sounds, RPG Audio, Music Jingles
+  ui_click(click_002) ui_hover(tick_002) upgrade(maximize_006) send_unit(open_002) shot_funkenwerfer(scratch_002)
+  transform(glass_002+maximize_008, echo) leak(error_006) wave_tick(bong_001) build(impactWood_heavy_001)
+  shot_glocke(impactBell_heavy_001) shot_esse_pulse(impactMetal_heavy_002) impact(impactSoft_medium_001) hero_move(footstep_grass_001)
+  sell(handleCoins2) gold(handleCoins) shot_wachfeuer(cloth3, pitched) shot_lichtspeer(drawKnife2)
+  victory(jingles_PIZZI10) defeat(jingles_PIZZI05)
+OpenGameArt.org, CC0:
+  music_menu: "Calm3 - Peaceful Days" from "JRPG Pack 4 Calm" by Juhani Junkala (subspaceaudio) https://opengameart.org/content/jrpg-pack-4-calm
+  music_battle: "Medieval: The Bard's Tale" (loop) by RandomMind https://opengameart.org/content/medieval-the-bards-tale
+  ambient_garden: "Forest Ambience" https://opengameart.org/content/forest-ambience
+Credit not required but appreciated.
