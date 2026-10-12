@@ -31,19 +31,19 @@ function genUp(cost,b2){// 2 Pfade × 3 Stufen, Kosten ×1,5 je Stufe (Doc); Pfa
 const RACE={
  menschen:{mark:'banner',n:'Lichtschmiede',c:'#3E7BD6',c2:'#F2B233',acc:'#FFF6E0',d:'Mach Ängste zu Licht. Jede Angst wird verwandelt. Viele hintereinander geben mehr Gold und Mut.',xform:1,
   t:{m_bogen:{n:'Funkenwerfer',ico:'✨',cost:10,vis:'pfeil',role:'DMG',d:'Wirft Licht, trifft auch Flieger',b:{dmg:7,rng:3,rate:.8,dt:'phys',spd:14}},
-   m_kanone:{n:'Amboss-Glocke',ico:'🔔',cost:20,vis:'kanone',role:'DMG',d:'Lichtwelle auf 1 Feld, nur Boden',b:{dmg:22,rng:2.6,rate:1.4,dt:'phys',spd:7,splash:1,ground:1}},
+   m_kanone:{n:'Glocke der Läuterung',ico:'🔔',cost:20,vis:'kanone',role:'DMG',d:'Lichtwelle auf 1 Feld, nur Boden',b:{dmg:22,rng:2.6,rate:1.4,dt:'phys',spd:7,splash:1,ground:1}},
    m_wacht:{n:'Wachfeuer',ico:'🔥',cost:14,vis:'pfeil',role:'CAMO',d:'Sieht versteckte Ängste',b:{dmg:5,rng:3,rate:.7,dt:'phys',spd:14,camo:1}},
    m_kapelle:{n:'Esse des Mutes',ico:'⚒',cost:24,vis:'aura',role:'SUP',d:'Gibt Mut: +15 % Kraft für Türme in 2 Feldern',b:{dmg:0,rng:2,rate:99,noAtk:1,aura:{dmgMul:1.15,r:2}}},
    m_ballista:{n:'Lichtspeer',ico:'🎯',cost:32,vis:'kanone',role:'AA',d:'Starker Lichtspeer, doppelt gegen Flieger',b:{dmg:45,rng:3.5,rate:1.6,dt:'phys',spd:16,airMul:1}}},
-  unit:{id:'paladin',n:'Glühende Probe',c:'#F2B233',cost:90,inc:11,hp:900,sp:1.1,unlock:200,heal:1,L:2,cd:30,d:'Leuchtet und heilt Ängste neben sich'},
+  unit:{id:'paladin',n:'Glühender Paladin',c:'#F2B233',cost:90,inc:11,hp:900,sp:1.1,unlock:200,heal:1,L:2,cd:30,d:'Leuchtet und heilt Ängste neben sich'},
   hero:{n:'Ilka',c:'#F2B233',ab:['amboss','goldregen']}},
  orks:{mark:'horns',n:'Glutriesen',c:'#E8402A',c2:'#FFB13B',acc:'#3A2E2A',d:'Zerschlag die Ängste! Viel Kraft und schnelle Türme. Jede Angst wird zu Licht, Mut bleibt übrig.',xform:1,
   t:{o_speer:{n:'Glutspeer',ico:'🔥',cost:10,vis:'pfeil',role:'DMG',d:'Glühender Speer, trifft 2 Ängste',b:{dmg:9,rng:2.8,rate:.9,dt:'phys',spd:13,pierce:2}},
    o_katapult:{n:'Felsfaust',ico:'🪨',cost:22,vis:'kanone',role:'DMG',d:'Wirft Glutfelsen auf 1,5 Felder, langsam',b:{dmg:34,rng:3,rate:2,dt:'phys',spd:6,splash:1.5,ground:1}},
-   o_trommel:{n:'Herztrommel',ico:'🥁',cost:24,vis:'aura',role:'SUP',d:'Gibt Mut: Türme in 2 Feldern +20 % schneller',b:{dmg:0,rng:2,rate:99,noAtk:1,aura:{rateMul:.83,r:2}}},
+   o_trommel:{n:'Glut-Kriegstrommel',ico:'🥁',cost:24,vis:'aura',role:'SUP',d:'Gibt Mut: Türme in 2 Feldern +20 % schneller',b:{dmg:0,rng:2,rate:99,noAtk:1,aura:{rateMul:.83,r:2}}},
    o_schamane:{n:'Aschenrufer',ico:'🌋',cost:18,vis:'blitz',role:'SLOW',d:'Glutkette auf 3 Ängste, macht sie 20 % langsamer',b:{dmg:6,rng:2.8,rate:1,dt:'magic',chain:3,slow:.2,slowDur:2}},
    o_wyvern:{n:'Glutfalken-Horst',ico:'🦅',cost:30,vis:'gift',role:'AA',d:'Nur Flieger, brennt 10/s',b:{dmg:25,rng:3.2,rate:1,dt:'phys',spd:12,airOnly:1,dot:10,dotDur:3}}},
-  unit:{id:'berserker',n:'Brennende Probe',c:'#E8402A',d:'Wird schneller, wenn sie schwach ist',cost:80,inc:10,hp:750,sp:1.2,unlock:200,berserk:1,L:2,cd:30},
+  unit:{id:'berserker',n:'Flammengeweihter',c:'#E8402A',d:'Wird schneller, wenn sie schwach ist',cost:80,inc:10,hp:750,sp:1.2,unlock:200,berserk:1,L:2,cd:30},
   hero:{n:'Torvan',c:'#FF6A2A',ab:['kriegsschrei','erdbeben']}},
  untote:{mark:'eyes',n:'Untote',c:'#6B3FA0',c2:'#7CFF4F',acc:'#D9D3C1',d:'Kontrolle & Wirtschaft',
   t:{u_ghul:{n:'Ghul-Grube',ico:'🦴',cost:10,vis:'pfeil',role:'DMG',d:'Ziel nimmt +15 % Schaden',b:{dmg:8,rng:2.6,rate:.85,dt:'phys',spd:12,amp:.15}},
@@ -62,19 +62,19 @@ const RACE={
   unit:{id:'wandler',n:'Gestaltwandler',c:'#4FE3D0',cost:85,inc:10,hp:650,sp:1.3,unlock:200,morph:1,L:2,cd:30},
   hero:{n:'Wächterin',c:'#CFE3FF',ab:['sternenregen','mondlicht']}},
  zwerge:{mark:'gear',n:'Hüter',c:'#5DBB4A',c2:'#FFE9F0',acc:'#8A6A3A',d:'Rette die Ängste! Viel Gold und starke Bremsen. Jede Angst wird zu Licht und wächst im Garten.',xform:1,
-  t:{z_gewehr:{n:'Samenschleuder',ico:'🌰',cost:11,vis:'pfeil',role:'DMG',d:'Samen sprengen harte Hüllen auf',b:{dmg:10,rng:2.8,rate:.85,dt:'phys',spd:16,ap:1}},
-   z_moerser:{n:'Kürbismörser',ico:'🎃',cost:20,vis:'kanone',role:'DMG',d:'Kürbis trifft 2 Felder',b:{dmg:26,rng:3,rate:1.8,dt:'phys',spd:6,splash:2,ground:1}},
-   z_flak:{n:'Pollenwolke',ico:'🌼',cost:26,vis:'kanone',role:'AA',d:'Nur Flieger, 4 auf einmal',b:{dmg:9,rng:3.2,rate:.6,dt:'phys',spd:16,airOnly:1,multi:4}},
+  t:{z_gewehr:{n:'Dornenschleuder',ico:'🌰',cost:11,vis:'pfeil',role:'DMG',d:'Samen sprengen harte Hüllen auf',b:{dmg:10,rng:2.8,rate:.85,dt:'phys',spd:16,ap:1}},
+   z_moerser:{n:'Sonnensaat-Mörser',ico:'🌻',cost:20,vis:'kanone',role:'DMG',d:'Sonnensaat trifft 2 Felder',b:{dmg:26,rng:3,rate:1.8,dt:'phys',spd:6,splash:2,ground:1}},
+   z_flak:{n:'Lichtstaub-Schleier',ico:'🌼',cost:26,vis:'kanone',role:'AA',d:'Nur Flieger, 4 auf einmal',b:{dmg:9,rng:3.2,rate:.6,dt:'phys',spd:16,airOnly:1,multi:4}},
    z_tesla:{n:'Rankenumarmung',ico:'🌿',cost:28,vis:'blitz',role:'SLOW',d:'Ranken halten 3 Ängste kurz fest',b:{dmg:7,rng:2.6,rate:1.1,dt:'magic',chain:3,freeze:1,freezeDur:.3}},
-   z_schmelze:{n:'Gewächshaus',ico:'🌱',cost:30,vis:'eco',role:'ECO',d:'+1,5 Gold/s, greift nicht an (max. 2)',max:2,b:{dmg:0,rng:0,rate:99,noAtk:1,gps:1.5}}},
+   z_schmelze:{n:'Hain der Wandlung',ico:'🌱',cost:30,vis:'eco',role:'ECO',d:'+1,5 Gold/s, greift nicht an (max. 2)',max:2,b:{dmg:0,rng:0,rate:99,noAtk:1,gps:1.5}}},
   unit:{id:'belagerung',n:'Uralter Hügel',c:'#7A8A5A',d:'Hart und zäh, Bremsen wirken schwach',cost:110,inc:13,hp:1300,sp:.8,unlock:220,armor:1,slowImm:.3,L:3,cd:35},
-  hero:{n:'Oma Bruma',c:'#9BD77A',ab:['sturmhammer','goldregen']}}};
+  hero:{n:'Bruma die Erwachte',c:'#9BD77A',ab:['sturmhammer','goldregen']}}};
 for(const[rk,R]of Object.entries(RACE))for(const[k,T]of Object.entries(R.t)){T.race=rk;T.c=R.c;T.gen=1;T.up=genUp(T.cost,T.b.camo?{n:'Verstärkt',d:'+0,3 Reichweite, 15 % schneller',cost:Math.round(T.cost*1.35),m:{rng:.3,rateMul:.85}}:null);
  if(T.b.noAtk)T.up=[[{n:'Ausbau',d:'Effekt verstärkt',cost:Math.round(T.cost*1.2),m:{auraUp:1}}],[]];TT[k]=T;}
 const raceTowers=rk=>Object.keys(RACE[rk].t);
 const ECO={incMin:.2,incDim:400,incHp:1900,startGold:70,bounty:1,hpMul:.8,sdStart:840,sdLen:220};
 const CT=[
- {id:'laeufer',n:'Läufer',c:'#ddd',cost:5,inc:1,hp:32,sp:1.6,gold:1,unlock:25},
+ {id:'laeufer',n:'Läufer',c:'#ddd',cost:5,inc:1,hp:32,sp:1.6,gold:1,unlock:5},
  {id:'flitzer',n:'Flitzer',c:'#ffe066',cost:10,inc:2,hp:55,sp:2.8,gold:1,unlock:60},
  {id:'panzer',n:'Panzer',c:'#a0703c',cost:18,inc:3,hp:200,sp:1.1,gold:2,unlock:90,armor:1},
  {id:'schatten',n:'Schatten',c:'#8a8fb0',cost:30,inc:4,hp:170,sp:2,gold:3,unlock:120,camo:1},
@@ -185,7 +185,7 @@ function elemStats(t,s){const D=elemDef(t);if(!D)return;const lv=D.lv,mul=LMUL[l
 function canSlot(p,t,e){if(!t||t.type!=='element'||!(p.runes?.[e]>0))return null;const el=t.el||(t.el=[]),i=el.findIndex(r=>r.e===e);
  if(i>=0)return null;if(!el.length)return{kind:'new',cost:0};
  if(el.length===1&&COMBO[comboKey(el[0].e,e)])return{kind:'fuse',cost:FUSE_COST};return null;}
-function buyRune(p,e){if(!ELEM[e]||p.gold<RUNE_COST)return false;p.gold-=RUNE_COST;p.runes=p.runes||{};p.runes[e]=(p.runes[e]||0)+1;return true;}
+const RUNE_MAX=2;function buyRune(p,e){if(!ELEM[e]||p.gold<RUNE_COST||(p.runeBuys||0)>=RUNE_MAX)return false;p.runeBuys=(p.runeBuys||0)+1;p.gold-=RUNE_COST;p.runes=p.runes||{};p.runes[e]=(p.runes[e]||0)+1;return true;}
 function slotRune(p,t,e){const c=canSlot(p,t,e);if(!c||p.gold<c.cost)return false;p.gold-=c.cost;p.runes[e]--;t.spent+=c.cost+RUNE_COST;t.upT=p.now||0;
  t.el.push({e,lv:1});return c.kind;}
 function elemCount(p){return p.towers.filter(t=>t.type==='element').length;}
@@ -331,7 +331,7 @@ function aiRunes(G,p,danger,needAir,needCamo){const R=Math.random;if(R()>(danger
  else if(el.length===1){const ks=Object.keys(COMBO).filter(k=>k.split('+').includes(el[0].e));e=R()<.75&&ks.length?ks[Math.floor(R()*ks.length)].split('+').find(x=>x!==el[0].e):el[0].e;}
  else e=null;
  if(el.length&&canUp(t,0)&&p.gold>=upCost(t,0)+15&&R()<.5){upgrade(p,t,0);return;}if(!e)return;
- p.runes=p.runes||{};const need=(p.runes[e]?0:RUNE_COST);if(!(p.runes[e]>0)&&p.gold<need+5)return;if(!(p.runes[e]>0))buyRune(p,e);const c=canSlot(p,t,e);if(c&&p.gold>=c.cost+10)slotRune(p,t,e);}
+ p.runes=p.runes||{};const need=(p.runes[e]?0:RUNE_COST);if(!(p.runes[e]>0)&&p.gold<need+5)return;if(!(p.runes[e]>0)&&!buyRune(p,e))return;const c=canSlot(p,t,e);if(c&&p.gold>=c.cost+10)slotRune(p,t,e);}
 // KI-Platzierung: Schadenstürme dorthin, wo sie die meisten Pfadzellen abdecken (Kurven/U-Turns, mittleres/spätes Labyrinth).
 // Kandidaten = vorhandene Mauern (werden ersetzt) + geplante Mauerzellen -> Labyrinth bleibt intakt. Splash bevorzugt Kurven, Slow früh im Pfad.
 function spotScore(p,ty,x,y,path,turn){const r=ty==='element'?3:TT[ty].b.rng||2.5,L=path.length||1,slow=ty==='frost',splash=ty==='kanone';let sc=0;
@@ -343,9 +343,12 @@ function plannedPath(p){// Pfad im fertigen Labyrinth (alle geplanten Mauern ges
 function aiPlaceDmg(p,ty){const cur=tracePath(p),fin=plannedPath(p);
  const mk=path=>({path,turn:path.map((c,i)=>i>0&&i<path.length-1&&(path[i-1][0]-c[0])!==(c[0]-path[i+1][0]))});const A=mk(cur),B=mk(fin);
  const spotScore2=(x,y)=>spotScore(p,ty,x,y,A.path,A.turn)*(p.plan&&p.plan.length?.8:0)+spotScore(p,ty,x,y,B.path,B.turn);const path=cur;
- const cand=[];for(const t of p.towers)if(t.type==='mauer')cand.push([t.x,t.y,t]);for(const[x,y]of(p.plan||[]).slice(0,30))if(!p.grid[y][x]&&canPlace(p,x,y))cand.push([x,y,null]);
+ const cand=[];for(const t of p.towers)if(t.type==='mauer')cand.push([t.x,t.y,t]);const nD=p.towers.filter(t=>!TT[t.type].wall).length,early=nD<8&&p.plan&&p.plan.length;let gain=null;
+ if(early){// Frühphase: nur Zellen des geplanten Schlangen-Labyrinths, gewichtet nach Weglängen-Zuwachs
+  const L0=p.dist[SPAWN.y][SPAWN.x];gain={};for(const[x,y]of p.plan){if(p.grid[y][x]||!canPlace(p,x,y))continue;p.grid[y][x]={tmp:1};const L=bfs(p.grid)[SPAWN.y][SPAWN.x];p.grid[y][x]=null;if(L===Infinity)continue;gain[x+','+y]=L-L0;cand.push([x,y,null]);}}
+ else for(const[x,y]of(p.plan||[]).slice(0,30))if(!p.grid[y][x]&&canPlace(p,x,y))cand.push([x,y,null]);
  if(!cand.length)for(let y=1;y<ROWS;y++)for(let x=0;x<COLS;x++)if(!p.grid[y][x]&&canPlace(p,x,y)&&path.some(([px,py])=>Math.abs(px-x)+Math.abs(py-y)===1))cand.push([x,y,null]);
- let best=null,bs=-1;for(const c of cand){const v=spotScore2(c[0],c[1]);if(v>bs){bs=v;best=c;}}if(!best||bs<=0)return null;
+ let best=null,bs=-1;for(const c of cand){const v=gain&&!c[2]?(gain[c[0]+','+c[1]]*10+spotScore2(c[0],c[1])+(ROWS-c[1])*.3+(path.some(([px,py])=>px===c[0]&&py===c[1])?8:path.some(([px,py])=>Math.abs(px-c[0])+Math.abs(py-c[1])<=1)?3:0)+((p.grid[c[1]]?.[c[0]-1]||p.grid[c[1]]?.[c[0]+1])?5:0)):spotScore2(c[0],c[1]);if(v>bs){bs=v;best=c;}}if(!best||bs<=0)return null;
  const[x,y,w]=best;if(w)sell(p,w);const t=build(p,ty,x,y);if(!t&&w)build(p,'mauer',x,y);if(t&&p.plan){const i=p.plan.findIndex(q=>q[0]===x&&q[1]===y);if(i>=0)p.plan.splice(i,1);}return t;}
 // KI-Rassen-Mischung: Angriffstürme gewichtet nach Rolle (DMG häufig, Aura/Eco selten)
 function raceMix(rk){const out=[];for(const k of raceTowers(rk)){const T=TT[k],w=T.role==='DMG'?3:T.role==='SLOW'?2:T.role==='AA'?1:1;for(let i=0;i<w;i++)out.push(k);}return out;}
@@ -438,4 +441,4 @@ function command(G,pi,c){const p=G.p[pi],T=c.id!=null?p.towers.find(t=>t.id===c.
  switch(c.op){case'build':return !!build(p,c.type,c.x,c.y);case'placeMaster':return !!placeMaster(p,c.x,c.y);case'pickMaster':return pickMaster(p,c.key);
   case'upgrade':return !!T&&upgrade(p,T,c.path);case'sell':if(!T||T.master)return false;sell(p,T);return true;case'target':if(!T||!TGT.includes(c.mode))return false;T.tgt=c.mode;return true;
   case'send':return sendCreep(G,pi,c.creep);case'collect':return collect(p);case'worker':return buyWorker(p);case'mineUp':return mineUp(p);case'pickRace':return pickRace(p,c.race);case'heroMove':return heroMove(p,c.x,c.y);case'heroAbility':return heroAbility(G,pi,c.i);case'buildMany':return buildMany(p,c.type,c.cells);case'buyRune':return buyRune(p,c.e);case'slotRune':return slotRune(p,T,c.e);case'masterUp':return mUp(p);}return false;}
-if(typeof module!=='undefined')module.exports={aiHero,raceMix,RACE,raceTowers,ABIL,SPECIAL,pickRace,heroAbility,heroMove,heroXpNeed,heroStats,ctAvail,sendCd,planBuild,buildMany,aiPlaceDmg,pathCoverage,ELEM,COMBO,RUNE_COST,FUSE_COST,LVL_COST,buyRune,slotRune,canSlot,elemDef,comboKey,typeCount,getSnapshot,command,tracePath,EVT,evOn,MINE,buyWorker,mineUp,collect,workerCost,creepCost,ECO,incGain,defEval,aiThink,newGame,step,build,canPlace,sell,upgrade,canUp,tStats,sendCreep,pickMaster,placeMaster,mUp,bfs,pickTarget,dmgMul,COLS,ROWS,SPAWN,TT,CT};
+if(typeof module!=='undefined')module.exports={aiHero,raceMix,RACE,raceTowers,ABIL,SPECIAL,pickRace,heroAbility,heroMove,heroXpNeed,heroStats,ctAvail,sendCd,planBuild,buildMany,aiPlaceDmg,pathCoverage,ELEM,COMBO,RUNE_COST,RUNE_MAX,FUSE_COST,LVL_COST,buyRune,slotRune,canSlot,elemDef,comboKey,typeCount,getSnapshot,command,tracePath,EVT,evOn,MINE,buyWorker,mineUp,collect,workerCost,creepCost,ECO,incGain,defEval,aiThink,newGame,step,build,canPlace,sell,upgrade,canUp,tStats,sendCreep,pickMaster,placeMaster,mUp,bfs,pickTarget,dmgMul,COLS,ROWS,SPAWN,TT,CT};

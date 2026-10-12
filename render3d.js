@@ -121,7 +121,7 @@ const lanes=[0,1].map(pi=>{const grp=new THREE.Group();scene.add(grp);
  const mlab=label('Goldmine',2.2);mlab.position.y=2.1;mine.add(mlab);
  const mhit=new THREE.Mesh(new THREE.BoxGeometry(2.6,2.6,3.4),new THREE.MeshBasicMaterial({visible:false}));mhit.position.set(0,1,.8);mhit.userData={pi,mine:1};mine.add(mhit);grp.add(mine);
  // Schrein (Säulen, Dach, schwebende Rune mit Licht)
- const shr=new THREE.Group();shr.position.copy(W(pi,COLS+1.8,8.6));const st=M(0xd9d2c3);
+ const shr=new THREE.Group();shr.position.copy(W(pi,COLS+1.8,13.5));const st=M(0xd9d2c3);
  mk(new THREE.BoxGeometry(1.6,.3,1.6),st,.15,shr);for(const[x,z]of[[-.6,-.6],[.6,-.6],[-.6,.6],[.6,.6]])mk(cyl(.1,.1,1.2,6),st,.9,shr).position.set(x,.9,z);
  const roof=mk(new THREE.ConeGeometry(1.3,.7,4),M(0x7a3ab0),1.85,shr);roof.rotation.y=Math.PI/4;
  const orb=new THREE.Mesh(new THREE.IcosahedronGeometry(.26,0),new THREE.MeshBasicMaterial({color:0x7ff7ff}));orb.position.y=.85;shr.add(orb);const ol=new THREE.PointLight(0x7ff7ff,2,4);ol.position.y=.9;shr.add(ol);
