@@ -442,7 +442,7 @@ function tensionCheck(){mineHint();if(!G)return;const p=G.p[0];AU.setTension(!G.
 let loopErr=0;function loop(ts){requestAnimationFrame(loop);try{loopBody(ts);}catch(e){if(loopErr++<5)console.error(e);}}
 function loopBody(ts){tensionCheck();const dt=Math.min(.05,(ts-last)/1000||0);last=ts;shake=Math.max(0,shake-dt);
  if(ONL&&G&&G.started&&!G.over){step(G,dt);if(G.over&&!ONL.over)G.over=null;uiT-=dt;if(uiT<=0){uiT=.25;ui();}playEv();}
- else if(G&&!paused&&G.started&&!G.over){if(LOC&&!LOC.done){for(let i=0;i<speed;i++)step(LOC.Gw,dt);LOC.acc+=dt*speed;if(LOC.acc>=.1){LOC.acc=0;locSync();}}for(let i=0;i<speed;i++)step(G,dt);if(LOC&&!LOC.done)G.over=null;uiT-=dt;if(uiT<=0){uiT=.25;ui();}
+ else if(G&&!paused&&G.started&&!G.over){if(LOC&&!LOC.done){LOC.sa=Math.min(.25,(LOC.sa||0)+dt*speed);while(LOC.sa>=.05){step(LOC.Gw,.05);LOC.sa-=.05;}LOC.acc+=dt*speed;if(LOC.acc>=.1){LOC.acc=0;locSync();}}for(let i=0;i<speed;i++)step(G,dt);if(LOC&&!LOC.done)G.over=null;uiT-=dt;if(uiT<=0){uiT=.25;ui();}
   playEv();if(G.over&&!G.online){AU.sfx(G.over);$('ov').style.display='flex';$('ov').innerHTML=`<div class="box"><h1>${G.over==='win'?'Sieg! 🏆':'Niederlage 💀'}</h1><p>${G.over==='win'?'Die KI hat alle Leben verloren.':'Du hast alle Leben verloren.'}</p><button id="again">Neues Spiel</button></div>`;$('again').onclick=start;}}
  if(G)draw();}
 // ===== Online-PvP (server-autoritativ): Eingaben -> Server, Server-Zustand -> hydrate(G) =====
