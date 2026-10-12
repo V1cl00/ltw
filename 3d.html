@@ -104,13 +104,28 @@ button:active:not(:disabled){transform:translateY(4px);box-shadow:inset 0 1px 0 
 #hint{background:rgba(0,0,0,.4)!important;font-size:13px}
 #hI .incT{display:inline-flex!important;align-items:center;gap:3px;margin-left:5px;font-weight:700;color:#FFE08A;font-size:13px;white-space:nowrap;opacity:1!important;visibility:visible!important}
 #hI{white-space:nowrap}
+
+#ov.ttl{z-index:30;background:radial-gradient(ellipse at 50% 40%,rgba(60,40,10,.35),rgba(5,6,14,.82) 70%);backdrop-filter:blur(6px) saturate(1.2);-webkit-backdrop-filter:blur(6px) saturate(1.2)}
+#ov.ttl::before{content:"";position:absolute;inset:-20%;background:radial-gradient(circle at 30% 30%,rgba(242,178,51,.18),transparent 40%),radial-gradient(circle at 70% 70%,rgba(120,90,255,.14),transparent 45%);animation:tglow 9s ease-in-out infinite alternate;pointer-events:none}
+@keyframes tglow{from{transform:rotate(0) scale(1)}to{transform:rotate(25deg) scale(1.15)}}
+#ov .tbox{position:relative;text-align:center;width:min(92vw,520px)}
+#ov .tsub{color:#d9b56a;font:600 13px Georgia,serif;letter-spacing:6px;text-transform:uppercase;opacity:.85}
+#ov h1.ttitle{font:700 clamp(40px,9vw,76px)/1.05 Georgia,"Palatino Linotype",serif;margin:6px 0 4px;color:#ffd36b!important;-webkit-text-fill-color:#ffd36b;text-shadow:0 1px 0 #fff3c4,0 3px 0 #7a4a0a,0 5px 8px #000,0 0 26px rgba(242,178,51,.55)!important;animation:tpulse 4s ease-in-out infinite}
+@keyframes tpulse{50%{opacity:.88}}
+#ov .tline{height:2px;margin:6px auto 22px;width:70%;background:linear-gradient(90deg,transparent,#f2b233,transparent)}
+#ov button.tbtn{position:relative;display:flex;flex-direction:column;align-items:center;width:100%;margin:14px 0;padding:18px 20px 16px;border-radius:16px;border:2px solid #c9952e;background:linear-gradient(180deg,#3a2c52 0%,#1d1630 55%,#120d20 100%);box-shadow:inset 0 1px 0 rgba(255,236,180,.45),inset 0 -3px 0 rgba(0,0,0,.5),0 0 0 3px rgba(20,14,30,.9),0 0 0 4px #7a5a1c,0 10px 28px rgba(0,0,0,.6),0 0 22px rgba(242,178,51,.18);color:#f7e2a8;cursor:pointer;transition:transform .12s,box-shadow .2s}
+#ov button.tbtn:hover{transform:translateY(-2px);box-shadow:inset 0 1px 0 rgba(255,236,180,.6),inset 0 -3px 0 rgba(0,0,0,.5),0 0 0 3px rgba(20,14,30,.9),0 0 0 4px #d9a640,0 14px 34px rgba(0,0,0,.6),0 0 34px rgba(242,178,51,.45)}
+#ov button.tbtn b{font:700 26px Georgia,serif;letter-spacing:1px;color:#ffe7a3;text-shadow:0 2px 0 #000,0 0 10px rgba(242,178,51,.5)}
+#ov button.tbtn small{font:13px system-ui;color:#cdbb92;margin-top:4px;opacity:.85}
+#ov button.tbtn::before,#ov button.tbtn::after{display:none!important}
+#ov button.tbtn .ti{position:absolute;left:18px;top:50%;transform:translateY(-50%);font-size:28px;filter:drop-shadow(0 0 6px rgba(242,178,51,.6))}
 </style></head><body>
 <div id="top"><div id="stat"></div><button id="bView">👁</button><button id="bQ">Ultra</button><button id="bMute">🔊</button><button id="bHelp">?</button><button id="bPause">⏸</button><button id="bSpeed">1x</button></div>
 <div id="cwrap"><canvas id="cv"></canvas></div>
 <div id="bot"><div id="tabs"><button data-tab="bau"><img src="ui/bau.webp" alt="">Bauen</button><button data-tab="send"><img src="ui/send.webp" alt="">Senden</button><button data-tab="meister"><img src="ui/meister.webp" alt="">Schrein</button><button data-tab="mine" id="tabMine"><img src="ui/mine.webp" alt=""><span>Mine</span></button><button data-tab="held" id="tabHeld"><img src="ui/held.webp" alt=""><span>Held</span></button></div>
 <div id="panel"></div><div id="sheet"></div></div>
 <div id="hint"></div><div id="evb"></div><div id="tip"></div><div id="tut"><div class="box"><div id="tutT"></div><div class="rowb"><button id="tutSkip">Überspringen</button><button id="tutNext">Weiter ▶</button></div></div></div><div id="ov"></div>
-<script src="game.js?v=8"></script>
-<script src="net.js?v=8"></script>
+<script src="game.js?v=9"></script>
+<script src="net.js?v=9"></script>
 <script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
-<script type="module" src="render3d.js?v=8"></script></body></html>
+<script type="module" src="render3d.js?v=9"></script></body></html>
