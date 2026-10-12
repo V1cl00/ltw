@@ -1,0 +1,1 @@
+{"_doc":"Meshy-GLBs hier ablegen und eintragen. Schlüssel = Turm-ID (m_bogen, m_kanone, m_wacht, m_kapelle, m_ballista, mauer, ...). Wert = Dateiname oder {\"file\":\"x.glb\",\"height\":1.6}. Fehlende Dateien werden ignoriert (Platzhalter bleibt)."}

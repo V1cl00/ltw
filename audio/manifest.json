@@ -1,0 +1,109 @@
+{
+ "build": {
+  "file": "build.ogg",
+  "license": "CC0",
+  "source": "https://kenney.nl/assets/impact-sounds"
+ },
+ "coin": {
+  "file": "coin.ogg",
+  "license": "CC0",
+  "source": "https://kenney.nl/assets/rpg-audio"
+ },
+ "creep_death_pop": {
+  "file": "creep_death_pop.ogg",
+  "license": "CC0",
+  "source": "https://kenney.nl/assets/interface-sounds"
+ },
+ "defeat": {
+  "file": "defeat.ogg",
+  "license": "CC0",
+  "source": "https://kenney.nl/assets/music-jingles"
+ },
+ "event_start": {
+  "file": "event_start.ogg",
+  "license": "CC0",
+  "source": "https://kenney.nl/assets/music-jingles"
+ },
+ "explosion": {
+  "file": "explosion.ogg",
+  "license": "CC0",
+  "source": "https://kenney.nl/assets/sci-fi-sounds"
+ },
+ "hit": {
+  "file": "hit.ogg",
+  "license": "CC0",
+  "source": "https://kenney.nl/assets/impact-sounds"
+ },
+ "leak_warning": {
+  "file": "leak_warning.ogg",
+  "license": "CC0",
+  "source": "https://kenney.nl/assets/interface-sounds"
+ },
+ "life_steal": {
+  "file": "life_steal.ogg",
+  "license": "CC0",
+  "source": "https://kenney.nl/assets/digital-audio"
+ },
+ "music_calm": {
+  "file": "music_calm.mp3",
+  "license": "CC0",
+  "source": "https://opengameart.org/content/arrival-1",
+  "note": "OpenGameArt 'Arrival' loop, trimmed 90s"
+ },
+ "music_tension": {
+  "file": "music_tension.mp3",
+  "license": "CC0",
+  "source": "https://opengameart.org/content/epic-march-loop",
+  "note": "OpenGameArt 'Epic March Loop'"
+ },
+ "sell": {
+  "file": "sell.ogg",
+  "license": "CC0",
+  "source": "https://kenney.nl/assets/rpg-audio"
+ },
+ "send": {
+  "file": "send.ogg",
+  "license": "CC0",
+  "source": "https://kenney.nl/assets/sci-fi-sounds"
+ },
+ "shot_arrow": {
+  "file": "shot_arrow.ogg",
+  "license": "CC0",
+  "source": "https://kenney.nl/assets/rpg-audio"
+ },
+ "shot_cannon": {
+  "file": "shot_cannon.ogg",
+  "license": "CC0",
+  "source": "https://kenney.nl/assets/sci-fi-sounds"
+ },
+ "shot_frost": {
+  "file": "shot_frost.ogg",
+  "license": "CC0",
+  "source": "https://kenney.nl/assets/sci-fi-sounds"
+ },
+ "shot_lightning": {
+  "file": "shot_lightning.ogg",
+  "license": "CC0",
+  "source": "https://kenney.nl/assets/digital-audio"
+ },
+ "shot_poison": {
+  "file": "shot_poison.ogg",
+  "license": "CC0",
+  "source": "https://kenney.nl/assets/sci-fi-sounds"
+ },
+ "ui_tap": {
+  "file": "ui_tap.ogg",
+  "license": "CC0",
+  "source": "https://kenney.nl/assets/interface-sounds"
+ },
+ "upgrade": {
+  "file": "upgrade.ogg",
+  "license": "CC0",
+  "source": "https://kenney.nl/assets/digital-audio"
+ },
+ "victory": {
+  "file": "victory.ogg",
+  "license": "CC0",
+  "source": "https://kenney.nl/assets/music-jingles"
+ }
+}
